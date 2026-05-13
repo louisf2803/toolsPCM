@@ -1,0 +1,474 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atur Fee Kategori</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --border: #30363d;
+      --accent: #22d3ee;
+      --accent-2: #60a5fa;
+      --danger: #f87171;
+      --ok: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    .container {
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-top: 0.25rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .link-btn, button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.84rem;
+      text-decoration: none;
+      background: #111927;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .link-btn:hover, button:hover {
+      border-color: var(--accent);
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.8rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .field input {
+      width: 100%;
+      background: #111927;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0.56rem 0.66rem;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .submit-row {
+      margin-top: 0.85rem;
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .submit-row button {
+      border-color: var(--accent-2);
+    }
+
+    .message {
+      font-size: 0.85rem;
+      min-height: 1.15rem;
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    .message.success {
+      color: var(--ok);
+    }
+
+    .table-wrap {
+      margin-top: 1rem;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      padding: 0.65rem 0.45rem;
+      font-size: 0.87rem;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .delete-btn {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--danger);
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+    }
+
+    .empty {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 0.4rem 0.1rem;
+    }
+
+    @media (max-width: 760px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <div>
+        <h1>Atur Fee Kategori</h1>
+        <p>Tambahkan kategori dan fee berbeda untuk setiap channel.</p>
+      </div>
+      <div class="header-actions">
+        <a class="link-btn" href="/converter">Kembali ke menu</a>
+      </div>
+    </header>
+
+    <section class="panel">
+      <form id="categoryForm">
+        <div class="form-grid">
+          <div class="field">
+            <label for="categoryName">Nama kategori</label>
+            <input id="categoryName" name="categoryName" type="text" placeholder="Contoh: Elektronik" required>
+          </div>
+          <div class="field">
+            <label for="tokpedMallFee">Fee Tokped Mall (%)</label>
+            <input id="tokpedMallFee" name="tokpedMallFee" type="number" min="0" max="100" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="field">
+            <label for="tokpedRegularFee">Fee Tokped Regular (%)</label>
+            <input id="tokpedRegularFee" name="tokpedRegularFee" type="number" min="0" max="100" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="field">
+            <label for="shopeeFee">Fee Shopee (%)</label>
+            <input id="shopeeFee" name="shopeeFee" type="number" min="0" max="100" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button type="submit">Tambah kategori</button>
+          <div id="formMessage" class="message"></div>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama kategori</th>
+              <th>Tokped Mall (%)</th>
+              <th>Tokped Regular (%)</th>
+              <th>Shopee (%)</th>
+              <th>Default</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <p id="emptyState" class="empty">Belum ada kategori. Tambahkan dari form di atas.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://chvmmyhxmyzbspieqway.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNodm1teWh4bXl6YnNwaWVxd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NzY4NDgsImV4cCI6MjA4NjU1Mjg0OH0.pyHGGh43arTqs8Oc8AOXLPDB_ldk1MYErRBIuF1kv5E";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const SESSION_KEY = "categoryFeeAuthPassed";
+    const CATEGORY_TABLE = "categories";
+    const SETTINGS_TABLE = "app_settings";
+
+    if (sessionStorage.getItem(SESSION_KEY) !== "1") {
+      window.location.href = "fee-auth.html";
+    }
+
+    const categoryForm = document.getElementById("categoryForm");
+    const categoryNameInput = document.getElementById("categoryName");
+    const tokpedMallFeeInput = document.getElementById("tokpedMallFee");
+    const tokpedRegularFeeInput = document.getElementById("tokpedRegularFee");
+    const shopeeFeeInput = document.getElementById("shopeeFee");
+    const tableBody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+    const formMessage = document.getElementById("formMessage");
+
+    let settingsCache = [];
+    let defaultCategoryId = "";
+
+    async function loadSettings() {
+      const { data, error } = await db
+        .from(CATEGORY_TABLE)
+        .select("id,name,tokped_mall_fee,tokped_regular_fee,shopee_fee")
+        .order("created_at", { ascending: true });
+      if (error) {
+        throw error;
+      }
+      settingsCache = (data || []).map(function (item) {
+        return {
+          id: item.id,
+          name: item.name,
+          tokpedMallFee: Number(item.tokped_mall_fee) || 0,
+          tokpedRegularFee: Number(item.tokped_regular_fee) || 0,
+          shopeeFee: Number(item.shopee_fee) || 0
+        };
+      });
+    }
+
+    async function loadDefaultCategoryId() {
+      const { data, error } = await db
+        .from(SETTINGS_TABLE)
+        .select("default_category_id")
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) {
+        defaultCategoryId = "";
+        return;
+      }
+      defaultCategoryId = data?.default_category_id || "";
+    }
+
+    async function saveDefaultCategoryId(categoryId) {
+      const nextId = categoryId || null;
+      const { error } = await db
+        .from(SETTINGS_TABLE)
+        .upsert({ id: 1, default_category_id: nextId }, { onConflict: "id" });
+      if (error) {
+        throw error;
+      }
+      defaultCategoryId = categoryId || "";
+    }
+
+    function formatFee(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function showMessage(type, text) {
+      formMessage.className = "message " + type;
+      formMessage.textContent = text;
+    }
+
+    function clearMessage() {
+      formMessage.className = "message";
+      formMessage.textContent = "";
+    }
+
+    function renderTable() {
+      const items = settingsCache;
+      const activeDefaultId = defaultCategoryId && items.some(function (item) { return item.id === defaultCategoryId; })
+        ? defaultCategoryId
+        : "";
+      if (activeDefaultId !== defaultCategoryId) {
+        defaultCategoryId = "";
+      }
+      tableBody.innerHTML = "";
+      emptyState.style.display = items.length ? "none" : "block";
+
+      items.forEach(function (item) {
+        const isDefault = item.id === activeDefaultId;
+        const row = document.createElement("tr");
+        row.innerHTML = [
+          "<td>" + item.name + "</td>",
+          "<td>" + formatFee(item.tokpedMallFee) + "</td>",
+          "<td>" + formatFee(item.tokpedRegularFee) + "</td>",
+          "<td>" + formatFee(item.shopeeFee) + "</td>",
+          "<td>" +
+            (isDefault
+              ? "<strong>Default</strong>"
+              : "<button type='button' class='set-default-btn' data-id='" + item.id + "'>Jadikan default</button>") +
+          "</td>",
+          "<td><button type='button' class='delete-btn' data-id='" + item.id + "'>Hapus</button></td>"
+        ].join("");
+        tableBody.appendChild(row);
+      });
+    }
+
+    function parseFee(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num) || num < 0 || num > 100) {
+        return null;
+      }
+      return num;
+    }
+
+    categoryForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearMessage();
+
+      const name = categoryNameInput.value.trim();
+      const tokpedMallFee = parseFee(tokpedMallFeeInput.value);
+      const tokpedRegularFee = parseFee(tokpedRegularFeeInput.value);
+      const shopeeFee = parseFee(shopeeFeeInput.value);
+
+      if (!name) {
+        showMessage("error", "Nama kategori wajib diisi.");
+        return;
+      }
+
+      if (tokpedMallFee === null || tokpedRegularFee === null || shopeeFee === null) {
+        showMessage("error", "Semua fee harus angka 0 sampai 100.");
+        return;
+      }
+
+      const isDuplicate = settingsCache.some(function (item) {
+        return item.name.toLowerCase() === name.toLowerCase();
+      });
+
+      if (isDuplicate) {
+        showMessage("error", "Nama kategori sudah ada.");
+        return;
+      }
+
+      try {
+        const payload = {
+          id: (window.crypto?.randomUUID?.() || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7))),
+          name: name,
+          tokped_mall_fee: tokpedMallFee,
+          tokped_regular_fee: tokpedRegularFee,
+          shopee_fee: shopeeFee
+        };
+        const { error } = await db.from(CATEGORY_TABLE).insert(payload);
+        if (error) throw error;
+
+        await loadSettings();
+        renderTable();
+        categoryForm.reset();
+        showMessage("success", "Kategori berhasil ditambahkan.");
+        categoryNameInput.focus();
+      } catch (_error) {
+        showMessage("error", "Gagal menyimpan kategori ke database.");
+      }
+    });
+
+    tableBody.addEventListener("click", async function (event) {
+      const target = event.target;
+      if (target.classList.contains("set-default-btn")) {
+        const idToSet = target.getAttribute("data-id");
+        const exists = settingsCache.some(function (item) {
+          return item.id === idToSet;
+        });
+        if (!exists) {
+          showMessage("error", "Kategori tidak ditemukan.");
+          return;
+        }
+        try {
+          await saveDefaultCategoryId(idToSet);
+          renderTable();
+          showMessage("success", "Kategori default berhasil diatur.");
+        } catch (_error) {
+          showMessage("error", "Gagal mengatur kategori default.");
+        }
+        return;
+      }
+
+      if (!target.classList.contains("delete-btn")) {
+        return;
+      }
+
+      const id = target.getAttribute("data-id");
+      try {
+        const { error } = await db.from(CATEGORY_TABLE).delete().eq("id", id);
+        if (error) throw error;
+
+        if (defaultCategoryId === id) {
+          await saveDefaultCategoryId("");
+        }
+        await loadSettings();
+        renderTable();
+      } catch (_error) {
+        showMessage("error", "Gagal menghapus kategori.");
+      }
+    });
+
+    async function initPage() {
+      try {
+        await Promise.all([loadSettings(), loadDefaultCategoryId()]);
+        renderTable();
+      } catch (_error) {
+        showMessage("error", "Gagal memuat data dari database.");
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tools PC Master</title>
+  <meta name="description" content="Pusat perangkat untuk kebutuhan manajemen & operasional bisnis PC Master">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card-bg: rgba(26, 35, 50, 0.4);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #22d3ee;
+      --accent-glow: rgba(34, 211, 238, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(34, 211, 238, 0.08), transparent 35%),
+        radial-gradient(circle at 85% 30%, rgba(96, 165, 250, 0.08), transparent 35%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 4rem;
+      animation: fadeInDown 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .title {
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 20px rgba(165, 180, 252, 0.15));
+    }
+
+    .subtitle {
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      width: 100%;
+      justify-content: center;
+      animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    .tool-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3.5rem 2rem;
+      text-decoration: none;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+    }
+
+    .tool-card::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 28px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.4), transparent, rgba(96, 165, 250, 0.4));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(34, 211, 238, 0.15);
+      background: rgba(34, 45, 65, 0.5);
+    }
+
+    .tool-card:hover::after {
+      opacity: 1;
+    }
+
+    .icon-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.15), rgba(34, 211, 238, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+    }
+
+    .icon-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      background: var(--accent);
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: -1;
+    }
+
+    .tool-card:hover .icon-wrapper {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(34, 211, 238, 0.1));
+      transform: scale(1.1) translateY(-5px);
+      border-color: rgba(34, 211, 238, 0.4);
+    }
+
+    .tool-card:hover .icon-wrapper::before {
+      opacity: 0.3;
+    }
+
+    .icon-wrapper svg {
+      width: 40px;
+      height: 40px;
+      color: var(--accent);
+      transition: transform 0.5s ease;
+    }
+
+    .tool-card:hover .icon-wrapper svg {
+      transform: scale(1.05);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.95rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+
+    .card-action svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    .tool-card:hover .card-action {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tool-card:hover .card-action svg {
+      transform: translateX(4px);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Background animated elements */
+    .blob {
+      position: absolute;
+      filter: blur(90px);
+      z-index: 1;
+      opacity: 0.4;
+      border-radius: 50%;
+      animation: float 12s infinite ease-in-out alternate;
+    }
+    
+    .blob-1 {
+      top: 5%;
+      left: 10%;
+      width: 400px;
+      height: 400px;
+      background: rgba(34, 211, 238, 0.12);
+    }
+    
+    .blob-2 {
+      bottom: 10%;
+      right: 10%;
+      width: 350px;
+      height: 350px;
+      background: rgba(96, 165, 250, 0.12);
+      animation-delay: -6s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        transform: translate(30px, 40px) scale(1.1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tools-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+      }
+      
+      .tool-card {
+        padding: 2.5rem 1.5rem;
+      }
+      
+      .blob {
+        opacity: 0.2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <main class="container">
+    <header class="header">
+      <h1 class="title">Tools PC Master</h1>
+      <p class="subtitle">Platform terpadu untuk efisiensi operasional dan manajemen bisnis Anda. Pilih tools yang ingin digunakan.</p>
+    </header>
+
+    <section class="tools-grid">
+      <!-- Tool Card: Converter Harga -->
+      <a href="/converter" class="tool-card">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="card-title">Converter Harga Marketplace</h2>
+        <p class="card-desc">Hitung otomatis profit dan sesuaikan harga jual di berbagai marketplace sesuai dengan biaya admin terbaru.</p>
+        <div class="card-action">
+          Buka Tool
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </div>
+      </a>
+    </section>
+  </main>
+</body>
+</html>

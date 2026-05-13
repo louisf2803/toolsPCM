@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifikasi Fee Kategori</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --border: #30363d;
+      --accent: #22d3ee;
+      --danger: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      width: min(460px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    input {
+      width: 100%;
+      background: #111927;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
+      outline: none;
+      margin-bottom: 0.8rem;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.2rem;
+    }
+
+    button, .back-link {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.85rem;
+      text-decoration: none;
+      background: #111927;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    button {
+      border-color: var(--accent);
+    }
+
+    .error {
+      margin-top: 0.75rem;
+      color: var(--danger);
+      font-size: 0.85rem;
+      min-height: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Verifikasi Password</h1>
+    <p>Masukkan password untuk membuka halaman atur fee kategori.</p>
+
+    <form id="authForm">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+      <div class="actions">
+        <button type="submit">Lanjut</button>
+        <a class="back-link" href="/converter">Kembali</a>
+      </div>
+      <div id="error" class="error"></div>
+    </form>
+  </main>
+
+  <script>
+    const PASSWORD = "SundaEmpire2020";
+    const SESSION_KEY = "categoryFeeAuthPassed";
+
+    const authForm = document.getElementById("authForm");
+    const passwordInput = document.getElementById("password");
+    const errorEl = document.getElementById("error");
+
+    authForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (passwordInput.value === PASSWORD) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        window.location.href = "category-fee-settings.html";
+        return;
+      }
+      errorEl.textContent = "Password salah.";
+      passwordInput.focus();
+      passwordInput.select();
+    });
+  </script>
+</body>
+</html>

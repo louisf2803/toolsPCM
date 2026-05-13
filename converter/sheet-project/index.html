@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sheet Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030e1f;
+      --surface: #081525;
+      --grid-header: #1dabc9;
+      --grid-line: #36d8f8;
+      --text: #e8f2ff;
+      --muted: #a4bed8;
+      --chip-bg: #0e1f34;
+      --chip-border: rgba(54, 216, 248, 0.5);
+      --input-bg: #061222;
+      --brand: #35afd3;
+      --dark-btn: #14233a;
+      --topbar: #0a1628;
+    }
+
+    body.theme-itpoint {
+      --grid-header: #2f7de3;
+      --grid-line: #7fb3ff;
+      --brand: #60a5fa;
+      --chip-border: rgba(127, 179, 255, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "DM Sans", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1.1rem;
+    }
+
+    .page {
+      width: min(1260px, 100%);
+      margin: 0 auto;
+    }
+
+    .top-section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.95rem;
+      flex-wrap: wrap;
+    }
+
+    .back-top {
+      display: inline-flex;
+      margin-bottom: 0.72rem;
+    }
+
+    .project-title-input {
+      color: var(--brand);
+      font-size: clamp(1.45rem, 2.7vw, 2.05rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      font-weight: 700;
+      font-family: inherit;
+      width: min(560px, 92vw);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 0.06rem 0.4rem;
+      margin-left: -0.4rem;
+      outline: none;
+      transition: border-color 0.14s ease, background-color 0.14s ease;
+    }
+
+    .project-title-input:hover {
+      border-color: color-mix(in srgb, var(--brand) 55%, #dbeafe 45%);
+      background: rgba(15, 33, 52, 0.4);
+    }
+
+    .project-title-input:focus {
+      border-color: var(--brand);
+      background: rgba(15, 33, 52, 0.6);
+    }
+
+    .project-mode {
+      color: var(--text);
+      font-size: 1.02rem;
+      margin-top: 0.18rem;
+      opacity: 0.95;
+    }
+
+    .store-tabs {
+      display: flex;
+      gap: 0.45rem;
+      background: var(--topbar);
+      border: 1px solid rgba(106, 140, 176, 0.25);
+      border-radius: 8px;
+      padding: 0.24rem;
+      min-width: 360px;
+    }
+
+    .store-tab {
+      flex: 1;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #8ba2bc;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.5rem 0.68rem;
+      cursor: pointer;
+      transition: background 0.16s ease, color 0.16s ease;
+    }
+
+    .store-tab.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .sheet-wrap {
+      border: 1px solid rgba(54, 216, 248, 0.48);
+      background: var(--surface);
+      max-height: 72vh;
+      overflow: auto;
+      border-radius: 2px;
+      position: relative;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(110, 145, 176, 0.9) rgba(8, 21, 37, 0.35);
+      scrollbar-gutter: stable both-edges;
+    }
+
+    .sheet-wrap::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .sheet-wrap::-webkit-scrollbar-track {
+      background: linear-gradient(180deg, rgba(7, 18, 33, 0.75), rgba(6, 15, 29, 0.75));
+      border-radius: 999px;
+      border: 1px solid rgba(71, 95, 121, 0.24);
+    }
+
+    .sheet-wrap::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(121, 152, 180, 0.95), rgba(95, 124, 150, 0.95));
+      border-radius: 999px;
+      border: 2px solid rgba(7, 18, 33, 0.85);
+    }
+
+    .sheet-wrap::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(143, 173, 200, 1), rgba(110, 141, 168, 1));
+    }
+
+    .sheet-wrap::-webkit-scrollbar-corner {
+      background: rgba(7, 18, 33, 0.75);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 980px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: var(--grid-header);
+      color: #fff;
+      text-align: center;
+      font-size: 1.02rem;
+      font-weight: 700;
+      padding: 0.68rem 0.45rem;
+      border-right: 2px solid rgba(129, 241, 255, 0.8);
+      border-bottom: 2px solid rgba(129, 241, 255, 0.8);
+    }
+
+    thead th:last-child,
+    tbody td:last-child {
+      border-right: none;
+    }
+
+    tbody td {
+      min-height: 42px;
+      border-right: 2px solid var(--grid-line);
+      border-bottom: 2px solid var(--grid-line);
+      padding: 0.36rem 0.42rem;
+      vertical-align: middle;
+      color: #cff8ff;
+      background: rgba(4, 12, 24, 0.8);
+    }
+
+    tbody td.grid-selected {
+      background: color-mix(in srgb, var(--brand) 28%, rgba(4, 12, 24, 0.8) 72%);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 70%, #ffffff 30%);
+    }
+
+    tbody td.grid-active {
+      box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--brand) 78%, #ffffff 22%);
+    }
+
+    .col-no {
+      width: 70px;
+      text-align: center;
+      font-size: 1rem;
+      color: #e6fdff;
+      background: rgba(24, 150, 186, 0.45);
+    }
+
+    .item-input,
+    .price-input,
+    .net-input {
+      width: 100%;
+      border: 1px solid transparent;
+      background: var(--input-bg);
+      color: #f1fbff;
+      border-radius: 5px;
+      padding: 0.5rem 0.56rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .item-input:focus,
+    .price-input:focus,
+    .net-input:focus {
+      border-color: var(--grid-line);
+    }
+
+    .category-chip {
+      width: 100%;
+      appearance: none;
+      border: 1.6px solid color-mix(in srgb, var(--brand) 52%, #eaf4ff 48%);
+      background: linear-gradient(180deg, #16355e 0%, #112a4a 100%);
+      color: #f4fbff;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 0.42rem 2rem 0.42rem 0.7rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      background-image:
+        linear-gradient(180deg, #16355e 0%, #112a4a 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23dff7ff'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.165l3.71-3.934a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat, no-repeat;
+      background-size: 100% 100%, 14px 14px;
+      background-position: 0 0, calc(100% - 9px) center;
+    }
+
+    .category-chip:hover {
+      border-color: color-mix(in srgb, var(--brand) 70%, #ffffff 30%);
+      filter: brightness(1.05);
+    }
+
+    .category-chip:focus {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 58%, transparent 42%);
+    }
+
+    .category-chip option {
+      background: #0f2743;
+      color: #f5fbff;
+      font-weight: 600;
+    }
+
+    .category-chip:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .output-cell {
+      color: #eafcff;
+      font-weight: 600;
+      font-size: 0.91rem;
+    }
+
+    .footer-actions {
+      margin-top: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .left-actions,
+    .right-actions {
+      display: flex;
+      gap: 0.52rem;
+      align-items: center;
+    }
+
+    .btn {
+      border: 1px solid rgba(106, 140, 176, 0.45);
+      border-radius: 999px;
+      text-decoration: none;
+      background: var(--dark-btn);
+      color: #d3e2f5;
+      padding: 0.42rem 0.82rem;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .status-text {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .sentinel-row td {
+      height: 1px;
+      border: none;
+      background: transparent;
+      padding: 0;
+    }
+
+    .empty-state {
+      margin-top: 0.5rem;
+      color: #fda4af;
+      display: none;
+    }
+
+    .selection-lock {
+      user-select: none;
+    }
+
+    tbody td.grid-drop-target {
+      background: color-mix(in srgb, var(--brand) 18%, rgba(4, 12, 24, 0.8) 82%);
+      box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--brand) 85%, #ffffff 15%);
+    }
+
+    @media (max-width: 760px) {
+      .store-tabs {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body class="theme-technosify">
+  <main class="page">
+    <a class="btn back-top" href="/converter/sheet-style-converter">kembali ke project list</a>
+
+    <section class="top-section">
+      <div>
+        <input
+          id="projectTitleInput"
+          class="project-title-input"
+          type="text"
+          value="Nama Project"
+          aria-label="Nama project"
+          spellcheck="false"
+        >
+        <p class="project-mode" id="projectMode">Marketplace >> Net Income</p>
+      </div>
+      <div class="store-tabs">
+        <button class="store-tab active" data-store="technosify" type="button">Technosify</button>
+        <button class="store-tab" data-store="itpoint" type="button">IT Point</button>
+      </div>
+    </section>
+
+    <div id="emptyState" class="empty-state">Project tidak ditemukan. Kembali dan buat project baru.</div>
+
+    <section class="sheet-wrap" id="sheetWrap">
+      <table>
+        <thead>
+          <tr id="headerRow"></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </section>
+
+    <div class="footer-actions">
+      <div class="left-actions"></div>
+      <div class="right-actions">
+        <span class="status-text" id="statusText">Tersimpan otomatis</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://chvmmyhxmyzbspieqway.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNodm1teWh4bXl6YnNwaWVxd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NzY4NDgsImV4cCI6MjA4NjU1Mjg0OH0.pyHGGh43arTqs8Oc8AOXLPDB_ldk1MYErRBIuF1kv5E";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const CATEGORY_TABLE = "categories";
+    const SETTINGS_TABLE = "app_settings";
+    const PROJECT_TABLE = "projects";
+    const PROJECT_ROW_TABLE = "project_rows";
+    const ROW_BATCH_SIZE = 30;
+    const DEFAULT_SERVICE_FEE_RATE = {
+      technosify: { tokped: 0.025, shopee: 0.045 },
+      itpoint: { tokped: 0.0425, shopee: 0.045 }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get("projectId") || "";
+    const tableBody = document.getElementById("tableBody");
+    const headerRow = document.getElementById("headerRow");
+    const statusText = document.getElementById("statusText");
+    const emptyState = document.getElementById("emptyState");
+    const sheetWrap = document.getElementById("sheetWrap");
+    const projectTitleInput = document.getElementById("projectTitleInput");
+
+    let currentStore = "technosify";
+    let project = null;
+    let rows = [];
+    let saveTimer = null;
+    let renameTimer = null;
+    let isSavingRows = false;
+    let hasPendingRowsSave = false;
+    let categoriesCache = [];
+    let defaultCategoryIdCache = "";
+    let isSelecting = false;
+    let selection = null;
+    let isDraggingSelection = false;
+    let dragTargetStartRow = null;
+
+    function createId() {
+      if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (char) {
+        const rnd = Math.random() * 16 | 0;
+        const val = char === "x" ? rnd : (rnd & 0x3 | 0x8);
+        return val.toString(16);
+      });
+    }
+
+    function fmt(n) {
+      return new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(Math.round(n || 0));
+    }
+
+    function parseIdr(value) {
+      const raw = String(value || "").replace(/[^\d]/g, "");
+      return parseInt(raw, 10) || 0;
+    }
+
+    function formatIdrInputValue(value) {
+      const num = parseIdr(value);
+      return num ? "Rp " + fmt(num) : "";
+    }
+
+    function formatPercent(value) {
+      return Number(value).toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    async function loadProject() {
+      const { data, error } = await db
+        .from(PROJECT_TABLE)
+        .select("id,name,type")
+        .eq("id", projectId)
+        .maybeSingle();
+      if (error) throw error;
+      return data ? { id: data.id, name: data.name, type: data.type } : null;
+    }
+
+    function readCategories() {
+      return categoriesCache;
+    }
+
+    function readDefaultCategoryId() {
+      return defaultCategoryIdCache;
+    }
+
+    async function loadCategoriesAndDefault() {
+      const categoriesRes = await db
+        .from(CATEGORY_TABLE)
+        .select("id,name,tokped_mall_fee,tokped_regular_fee,shopee_fee")
+        .order("created_at", { ascending: true });
+      if (categoriesRes.error) throw categoriesRes.error;
+
+      categoriesCache = (categoriesRes.data || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        tokpedMallFee: Number(item.tokped_mall_fee) || 0,
+        tokpedRegularFee: Number(item.tokped_regular_fee) || 0,
+        shopeeFee: Number(item.shopee_fee) || 0
+      }));
+
+      const settingsRes = await db
+        .from(SETTINGS_TABLE)
+        .select("default_category_id")
+        .eq("id", 1)
+        .maybeSingle();
+      if (settingsRes.error) {
+        defaultCategoryIdCache = "";
+        return;
+      }
+      defaultCategoryIdCache = settingsRes.data?.default_category_id || "";
+    }
+
+    function defaultRow(index, categoryId) {
+      return {
+        id: createId(),
+        itemName: "",
+        categoryId: categoryId || "",
+        sourceValue: ""
+      };
+    }
+
+    function getFallbackCategoryId() {
+      const categories = readCategories();
+      const defaultId = readDefaultCategoryId();
+      return categories.find((item) => item.id === defaultId)?.id || categories[0]?.id || "";
+    }
+
+    async function readRows() {
+      const { data, error } = await db
+        .from(PROJECT_ROW_TABLE)
+        .select("id,item_name,category_id,source_value,row_order")
+        .eq("project_id", projectId)
+        .order("row_order", { ascending: true });
+      if (error) throw error;
+      return (data || []).map((item) => ({
+        id: item.id || createId(),
+        itemName: item.item_name || "",
+        categoryId: item.category_id || "",
+        sourceValue: item.source_value === null || item.source_value === undefined
+          ? ""
+          : String(item.source_value)
+      }));
+    }
+
+    async function persistRowsNow() {
+      if (!projectId) return;
+      if (isSavingRows) {
+        hasPendingRowsSave = true;
+        return;
+      }
+
+      isSavingRows = true;
+      statusText.textContent = "Menyimpan...";
+      const usedIds = new Set();
+      const snapshot = rows.map((row, index) => {
+        let rowId = row.id || createId();
+        if (usedIds.has(rowId)) {
+          rowId = createId();
+        }
+        usedIds.add(rowId);
+        row.id = rowId;
+        return {
+          id: rowId,
+        project_id: projectId,
+        row_order: index,
+        item_name: row.itemName || "",
+        category_id: row.categoryId || null,
+        // Compatible with numeric/text column definitions.
+        source_value: Number(row.sourceValue || 0)
+      };
+      });
+
+      try {
+        const { error: deleteError } = await db
+          .from(PROJECT_ROW_TABLE)
+          .delete()
+          .eq("project_id", projectId);
+        if (deleteError) throw deleteError;
+
+        if (snapshot.length) {
+          const { error: insertError } = await db.from(PROJECT_ROW_TABLE).insert(snapshot);
+          if (insertError) throw insertError;
+        }
+        statusText.textContent = "Tersimpan otomatis";
+      } catch (_error) {
+        console.error("Failed to save project rows", _error);
+        statusText.textContent = "Gagal menyimpan";
+      } finally {
+        isSavingRows = false;
+        if (hasPendingRowsSave) {
+          hasPendingRowsSave = false;
+          persistRowsNow();
+        }
+      }
+    }
+
+    function scheduleSaveRows() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        persistRowsNow();
+      }, 300);
+    }
+
+    function getServiceFeeRate(store, marketplace, category) {
+      const defaultRate = DEFAULT_SERVICE_FEE_RATE[store]?.[marketplace] ?? 0;
+      if (!category) return defaultRate;
+      let feePercent = null;
+      if (marketplace === "tokped") {
+        feePercent = store === "technosify" ? category.tokpedMallFee : category.tokpedRegularFee;
+      } else {
+        feePercent = category.shopeeFee;
+      }
+      const parsed = Number(feePercent);
+      if (!Number.isFinite(parsed) || parsed < 0) return defaultRate;
+      return parsed / 100;
+    }
+
+    function feesTokpedMallBefore(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xbp = Math.min(0.035 * harga, 60000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      return { net: harga - totalFee, totalFee };
+    }
+
+    function feesTokpedMallAfter(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.03 * harga, 650000);
+      const xbp = Math.min(0.035 * harga, 60000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      return { net: harga - totalFee, totalFee };
+    }
+
+    function feesTokpedBiasaBefore(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xboost = Math.min(0.035 * harga, 60000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      return { net: harga - totalFee, totalFee };
+    }
+
+    function feesTokpedBiasaAfter(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.03 * harga, 650000);
+      const xboost = Math.min(0.035 * harga, 60000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      return { net: harga - totalFee, totalFee };
+    }
+
+    function feesShopeeBiasa(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const promoXtra = Math.min(0.045 * harga, 60000);
+      const ongkirXtra = Math.min(0.06 * harga, 40000);
+      const asuransi = 0.005 * harga;
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + promoXtra + ongkirXtra + asuransi + biayaTransaksi;
+      return { net: harga - totalFee, totalFee };
+    }
+
+    function calcNet(store, marketplace, harga, category, period = 'before') {
+      const serviceFeeRate = getServiceFeeRate(store, marketplace, category);
+      if (store === "technosify" && marketplace === "tokped") return period === 'before' ? feesTokpedMallBefore(harga, serviceFeeRate) : feesTokpedMallAfter(harga, serviceFeeRate);
+      if (store === "technosify" && marketplace === "shopee") return feesShopeeBiasa(harga, serviceFeeRate);
+      if (store === "itpoint" && marketplace === "tokped") return period === 'before' ? feesTokpedBiasaBefore(harga, serviceFeeRate) : feesTokpedBiasaAfter(harga, serviceFeeRate);
+      if (store === "itpoint" && marketplace === "shopee") return feesShopeeBiasa(harga, serviceFeeRate);
+      return { net: 0, totalFee: 0 };
+    }
+
+    function findPriceForNet(store, marketplace, targetNet, category, period = 'before') {
+      if (targetNet <= 0) return 0;
+      let low = targetNet;
+      let high = targetNet * 3;
+      while (calcNet(store, marketplace, high, category, period).net < targetNet) high *= 2;
+      for (let i = 0; i < 80; i++) {
+        const mid = (low + high) / 2;
+        const net = calcNet(store, marketplace, mid, category, period).net;
+        if (Math.abs(net - targetNet) < 1) return Math.round(mid);
+        if (net < targetNet) low = mid;
+        else high = mid;
+      }
+      return Math.round((low + high) / 2);
+    }
+
+    function getModeText() {
+      return project.type === "net_income_to_marketplace"
+        ? "Net Income >> Marketplace"
+        : "Marketplace >> Net Income";
+    }
+
+    function applyProjectMeta() {
+      projectTitleInput.value = project.name || "";
+      document.title = (project.name || "Sheet Project") + " - Sheet Project";
+      document.getElementById("projectMode").textContent = getModeText();
+    }
+
+    function applyTheme(store) {
+      document.body.classList.toggle("theme-technosify", store === "technosify");
+      document.body.classList.toggle("theme-itpoint", store === "itpoint");
+    }
+
+    function persistProjectRename(nextName, immediate) {
+      const finalName = String(nextName || "").trim();
+      if (!finalName || finalName === project.name) {
+        projectTitleInput.value = project.name || "";
+        return;
+      }
+
+      const saveNow = async () => {
+        statusText.textContent = "Menyimpan nama project...";
+        const { error } = await db
+          .from(PROJECT_TABLE)
+          .update({ name: finalName })
+          .eq("id", project.id);
+        if (error) {
+          statusText.textContent = "Gagal menyimpan nama";
+          return;
+        }
+        project.name = finalName;
+        document.title = finalName + " - Sheet Project";
+        statusText.textContent = "Nama project tersimpan";
+      };
+
+      if (immediate) {
+        clearTimeout(renameTimer);
+        saveNow();
+        return;
+      }
+
+      statusText.textContent = "Menyimpan nama project...";
+      clearTimeout(renameTimer);
+      renameTimer = setTimeout(() => {
+        saveNow();
+      }, 220);
+    }
+
+    function buildHeader() {
+      const isN2M = project.type === "net_income_to_marketplace";
+      const labels = isN2M
+        ? ["No", "Nama Barang", "Kat. Fee", "Net Income", "Tokped (< 18 Mei)", "Tokped (>= 18 Mei)", "Marketplace Shopee"]
+        : ["No", "Nama Barang", "Kat. Fee", "Marketplace Price", "Tokped Net (< 18 Mei)", "Tokped Net (>= 18 Mei)", "Net Income Shopee"];
+
+      headerRow.innerHTML = labels.map((label) => "<th>" + label + "</th>").join("");
+    }
+
+    function normalizeSelection(nextSelection) {
+      if (!nextSelection) return null;
+      return {
+        startRow: Math.min(nextSelection.startRow, nextSelection.endRow),
+        endRow: Math.max(nextSelection.startRow, nextSelection.endRow),
+        startCol: Math.min(nextSelection.startCol, nextSelection.endCol),
+        endCol: Math.max(nextSelection.startCol, nextSelection.endCol),
+        anchorRow: nextSelection.anchorRow,
+        anchorCol: nextSelection.anchorCol
+      };
+    }
+
+    function clearSelectionStyles() {
+      tableBody.querySelectorAll("td.grid-selected, td.grid-active").forEach((cell) => {
+        cell.classList.remove("grid-selected");
+        cell.classList.remove("grid-active");
+      });
+    }
+
+    function clearDropPreviewStyles() {
+      tableBody.querySelectorAll("td.grid-drop-target").forEach((cell) => {
+        cell.classList.remove("grid-drop-target");
+      });
+    }
+
+    function applySelectionStyles() {
+      clearSelectionStyles();
+      if (!selection) return;
+      for (let r = selection.startRow; r <= selection.endRow; r++) {
+        for (let c = selection.startCol; c <= selection.endCol; c++) {
+          const cell = tableBody.querySelector("td[data-row-index='" + r + "'][data-col-index='" + c + "']");
+          if (cell) cell.classList.add("grid-selected");
+        }
+      }
+      const activeCell = tableBody.querySelector("td[data-row-index='" + selection.anchorRow + "'][data-col-index='" + selection.anchorCol + "']");
+      if (activeCell) activeCell.classList.add("grid-active");
+    }
+
+    function setSelection(anchorRow, anchorCol, targetRow, targetCol) {
+      selection = normalizeSelection({
+        startRow: anchorRow,
+        endRow: targetRow,
+        startCol: anchorCol,
+        endCol: targetCol,
+        anchorRow,
+        anchorCol
+      });
+      applySelectionStyles();
+    }
+
+    function clearSelectedEditableCells() {
+      if (!selection) return;
+      const fallbackCategory = getFallbackCategoryId();
+      for (let r = selection.startRow; r <= selection.endRow; r++) {
+        const row = rows[r];
+        if (!row) continue;
+        for (let c = selection.startCol; c <= selection.endCol; c++) {
+          if (c === 1) row.itemName = "";
+          if (c === 2 && fallbackCategory) row.categoryId = fallbackCategory;
+          if (c === 3) row.sourceValue = "";
+        }
+      }
+      renderRows();
+      scheduleSaveRows();
+    }
+
+    function getEditableFieldByCol(col) {
+      if (col === 1) return "itemName";
+      if (col === 2) return "categoryId";
+      if (col === 3) return "sourceValue";
+      return null;
+    }
+
+    function getDefaultValueForField(field) {
+      if (field === "categoryId") return getFallbackCategoryId();
+      return "";
+    }
+
+    function applyDropPreviewAt(startRow) {
+      clearDropPreviewStyles();
+      if (!selection) return;
+      const rowCount = selection.endRow - selection.startRow + 1;
+      for (let r = 0; r < rowCount; r++) {
+        for (let c = selection.startCol; c <= selection.endCol; c++) {
+          const cell = tableBody.querySelector("td[data-row-index='" + (startRow + r) + "'][data-col-index='" + c + "']");
+          if (cell) cell.classList.add("grid-drop-target");
+        }
+      }
+    }
+
+    function moveSelectionBlockTo(targetStartRow) {
+      if (!selection) return;
+      const sourceStartRow = selection.startRow;
+      const sourceEndRow = selection.endRow;
+      const rowCount = sourceEndRow - sourceStartRow + 1;
+      const maxStart = Math.max(0, rows.length - rowCount);
+      const safeTargetStart = Math.max(0, Math.min(targetStartRow, maxStart));
+      if (safeTargetStart === sourceStartRow) return;
+
+      ensureRowCount(safeTargetStart + rowCount);
+
+      const movedValues = [];
+      for (let r = sourceStartRow; r <= sourceEndRow; r++) {
+        const rowData = rows[r];
+        if (!rowData) continue;
+        for (let c = selection.startCol; c <= selection.endCol; c++) {
+          const field = getEditableFieldByCol(c);
+          if (!field) continue;
+          movedValues.push({
+            rowOffset: r - sourceStartRow,
+            col: c,
+            field,
+            value: rowData[field]
+          });
+        }
+      }
+
+      for (let r = sourceStartRow; r <= sourceEndRow; r++) {
+        const rowData = rows[r];
+        if (!rowData) continue;
+        for (let c = selection.startCol; c <= selection.endCol; c++) {
+          const field = getEditableFieldByCol(c);
+          if (!field) continue;
+          rowData[field] = getDefaultValueForField(field);
+        }
+      }
+
+      movedValues.forEach((item) => {
+        const destRowIndex = safeTargetStart + item.rowOffset;
+        const destRow = rows[destRowIndex];
+        if (!destRow) return;
+        destRow[item.field] = item.value;
+      });
+
+      const delta = safeTargetStart - sourceStartRow;
+      selection = normalizeSelection({
+        startRow: sourceStartRow + delta,
+        endRow: sourceEndRow + delta,
+        startCol: selection.startCol,
+        endCol: selection.endCol,
+        anchorRow: selection.anchorRow + delta,
+        anchorCol: selection.anchorCol
+      });
+      renderRows();
+      scheduleSaveRows();
+    }
+
+    function isInsideSelection(row, col) {
+      if (!selection) return false;
+      return row >= selection.startRow &&
+        row <= selection.endRow &&
+        col >= selection.startCol &&
+        col <= selection.endCol;
+    }
+
+    function isSelectionBorderHit(cell, clientX, clientY) {
+      if (!selection) return false;
+      const row = parseInt(cell.dataset.rowIndex, 10);
+      const col = parseInt(cell.dataset.colIndex, 10);
+      if (!isInsideSelection(row, col)) return false;
+
+      const rect = cell.getBoundingClientRect();
+      const threshold = 6;
+      const nearTop = Math.abs(clientY - rect.top) <= threshold;
+      const nearBottom = Math.abs(rect.bottom - clientY) <= threshold;
+      const nearLeft = Math.abs(clientX - rect.left) <= threshold;
+      const nearRight = Math.abs(rect.right - clientX) <= threshold;
+      return nearTop || nearBottom || nearLeft || nearRight;
+    }
+
+    function getRowIndexFromPointer(clientX, clientY) {
+      const hovered = document.elementFromPoint(clientX, clientY);
+      const cell = hovered ? hovered.closest("td[data-row-index][data-col-index]") : null;
+      if (!cell) return null;
+      const row = parseInt(cell.dataset.rowIndex, 10);
+      return Number.isFinite(row) ? row : null;
+    }
+
+    function buildCategoryOptions(selectedId) {
+      const categories = readCategories();
+      if (!categories.length) {
+        return {
+          html: "<option value=''>Belum ada kategori fee</option>",
+          value: "",
+          hasCategories: false
+        };
+      }
+
+      const defaultId = readDefaultCategoryId();
+      const fallbackId = categories.find((item) => item.id === defaultId)?.id || categories[0]?.id || "";
+      const activeSelected = categories.find((item) => item.id === selectedId)?.id || fallbackId;
+      const dynamicOptions = categories.map((item) => {
+        const selected = item.id === activeSelected ? " selected" : "";
+        return "<option value='" + item.id + "'" + selected + ">" + item.name + "</option>";
+      }).join("");
+      return { html: dynamicOptions, value: activeSelected || "", hasCategories: true };
+    }
+
+    function calculateRow(row) {
+      const categories = readCategories();
+      const category = categories.find((item) => item.id === row.categoryId) || null;
+      const source = parseIdr(row.sourceValue);
+      if (!source) return { tokpedBefore: "Rp 0", tokpedAfter: "Rp 0", shopee: "Rp 0" };
+
+      if (project.type === "net_income_to_marketplace") {
+        const tokpedBefore = findPriceForNet(currentStore, "tokped", source, category, "before");
+        const tokpedAfter = findPriceForNet(currentStore, "tokped", source, category, "after");
+        const shopeePrice = findPriceForNet(currentStore, "shopee", source, category, "before");
+        return { 
+          tokpedBefore: "Rp " + fmt(tokpedBefore), 
+          tokpedAfter: "Rp " + fmt(tokpedAfter), 
+          shopee: "Rp " + fmt(shopeePrice) 
+        };
+      }
+
+      const tokpedNetBefore = calcNet(currentStore, "tokped", source, category, "before").net;
+      const tokpedNetAfter = calcNet(currentStore, "tokped", source, category, "after").net;
+      const shopeeNet = calcNet(currentStore, "shopee", source, category, "before").net;
+      return { 
+        tokpedBefore: "Rp " + fmt(tokpedNetBefore), 
+        tokpedAfter: "Rp " + fmt(tokpedNetAfter), 
+        shopee: "Rp " + fmt(shopeeNet) 
+      };
+    }
+
+    function addRowsSilently(count) {
+      const fallbackCategory = getFallbackCategoryId();
+      for (let i = 0; i < count; i++) {
+        rows.push(defaultRow(rows.length + 1, fallbackCategory));
+      }
+    }
+
+    function appendRows(count) {
+      addRowsSilently(count);
+      renderRows();
+      scheduleSaveRows();
+    }
+
+    function ensureMinimumRows() {
+      if (!rows.length) {
+        addRowsSilently(ROW_BATCH_SIZE);
+      }
+    }
+
+    function ensureRowCount(minCount) {
+      if (rows.length >= minCount) return;
+      addRowsSilently(minCount - rows.length);
+    }
+
+    function normalizePastedValue(field, rawValue) {
+      if (field === "sourceValue") {
+        return String(rawValue || "").replace(/\D/g, "");
+      }
+      return String(rawValue || "");
+    }
+
+    function parseClipboardGrid(text) {
+      const normalized = String(text || "").replace(/\r/g, "");
+      const lines = normalized.split("\n").filter((line, index, arr) => {
+        if (line !== "") return true;
+        return index !== arr.length - 1;
+      });
+      return lines.map((line) => line.split("\t"));
+    }
+
+    function renderRows() {
+      tableBody.innerHTML = "";
+
+      rows.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.rowId = row.id;
+        const options = buildCategoryOptions(row.categoryId);
+        if (!row.categoryId && options.value) row.categoryId = options.value;
+        const result = calculateRow(row);
+        const sourceLabel = project.type === "net_income_to_marketplace" ? "Net income" : "Marketplace price";
+        tr.innerHTML = [
+          "<td class='col-no' data-row-index='" + index + "' data-col-index='0'>" + (index + 1) + "</td>",
+          "<td data-row-index='" + index + "' data-col-index='1'><input class='item-input' type='text' data-field='itemName' placeholder='Nama barang' value='" + escapeHtml(row.itemName || "") + "'></td>",
+          "<td data-row-index='" + index + "' data-col-index='2'><select class='category-chip' data-field='categoryId'" + (options.hasCategories ? "" : " disabled") + ">" + options.html + "</select></td>",
+          "<td data-row-index='" + index + "' data-col-index='3'><input class='" + (project.type === "net_income_to_marketplace" ? "net-input" : "price-input") + "' type='text' data-field='sourceValue' placeholder='" + sourceLabel + "' value='" + escapeHtml(formatIdrInputValue(row.sourceValue)) + "'></td>",
+          "<td class='output-cell' data-row-index='" + index + "' data-col-index='4'>" + result.tokpedBefore + "</td>",
+          "<td class='output-cell' data-row-index='" + index + "' data-col-index='5'>" + result.tokpedAfter + "</td>",
+          "<td class='output-cell' data-row-index='" + index + "' data-col-index='6'>" + result.shopee + "</td>"
+        ].join("");
+        tableBody.appendChild(tr);
+        const select = tr.querySelector("select");
+        select.value = row.categoryId || "";
+      });
+
+      const sentinelTr = document.createElement("tr");
+      sentinelTr.className = "sentinel-row";
+      sentinelTr.innerHTML = "<td colspan='7' id='scrollSentinel'></td>";
+      tableBody.appendChild(sentinelTr);
+      applySelectionStyles();
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function updateOneRowDisplay(rowElement, rowData) {
+      const outputs = rowElement.querySelectorAll(".output-cell");
+      const result = calculateRow(rowData);
+      outputs[0].textContent = result.tokpedBefore;
+      outputs[1].textContent = result.tokpedAfter;
+      outputs[2].textContent = result.shopee;
+    }
+
+    function bindEvents() {
+      document.querySelectorAll(".store-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".store-tab").forEach((item) => item.classList.remove("active"));
+          btn.classList.add("active");
+          currentStore = btn.dataset.store;
+          applyTheme(currentStore);
+          renderRows();
+        });
+      });
+
+      tableBody.addEventListener("input", (event) => {
+        const target = event.target;
+        const rowElement = target.closest("tr[data-row-id]");
+        if (!rowElement) return;
+        const rowId = rowElement.dataset.rowId;
+        const rowData = rows.find((item) => item.id === rowId);
+        if (!rowData) return;
+
+        if (target.dataset.field === "itemName") {
+          rowData.itemName = target.value;
+        }
+
+        if (target.dataset.field === "sourceValue") {
+          const raw = String(target.value).replace(/\D/g, "");
+          rowData.sourceValue = raw;
+          target.value = raw ? "Rp " + fmt(parseInt(raw, 10)) : "";
+          target.setSelectionRange(target.value.length, target.value.length);
+        }
+
+        updateOneRowDisplay(rowElement, rowData);
+        scheduleSaveRows();
+      });
+
+      tableBody.addEventListener("change", (event) => {
+        const target = event.target;
+        if (target.dataset.field !== "categoryId") return;
+        const rowElement = target.closest("tr[data-row-id]");
+        if (!rowElement) return;
+        const rowId = rowElement.dataset.rowId;
+        const rowData = rows.find((item) => item.id === rowId);
+        if (!rowData) return;
+        rowData.categoryId = target.value;
+        updateOneRowDisplay(rowElement, rowData);
+        scheduleSaveRows();
+      });
+
+      tableBody.addEventListener("paste", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        if (target.dataset.field !== "itemName" && target.dataset.field !== "sourceValue") return;
+
+        const rowElement = target.closest("tr[data-row-id]");
+        if (!rowElement) return;
+        const startRowId = rowElement.dataset.rowId;
+        const startRowIndex = rows.findIndex((item) => item.id === startRowId);
+        if (startRowIndex < 0) return;
+
+        const plainText = event.clipboardData?.getData("text/plain") || "";
+        const grid = parseClipboardGrid(plainText);
+        if (!grid.length) return;
+
+        event.preventDefault();
+
+        const startField = target.dataset.field;
+        const startFromItemCol = startField === "itemName";
+
+        ensureRowCount(startRowIndex + grid.length);
+
+        grid.forEach((cells, lineIndex) => {
+          const destRow = rows[startRowIndex + lineIndex];
+          if (!destRow) return;
+
+          if (startFromItemCol) {
+            if (cells.length >= 1) destRow.itemName = normalizePastedValue("itemName", cells[0]);
+            if (cells.length >= 2) destRow.sourceValue = normalizePastedValue("sourceValue", cells[1]);
+          } else if (cells.length >= 1) {
+            destRow.sourceValue = normalizePastedValue("sourceValue", cells[0]);
+          }
+        });
+
+        renderRows();
+        scheduleSaveRows();
+      });
+
+      tableBody.addEventListener("mousedown", (event) => {
+        const cell = event.target.closest("td[data-row-index][data-col-index]");
+        if (!cell) return;
+        if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) && !event.altKey) {
+          return;
+        }
+        const row = parseInt(cell.dataset.rowIndex, 10);
+        const col = parseInt(cell.dataset.colIndex, 10);
+        if (!Number.isFinite(row) || !Number.isFinite(col)) return;
+
+        if (isSelectionBorderHit(cell, event.clientX, event.clientY)) {
+          isDraggingSelection = true;
+          dragTargetStartRow = selection.startRow;
+          applyDropPreviewAt(dragTargetStartRow);
+          document.body.classList.add("selection-lock");
+          event.preventDefault();
+          return;
+        }
+
+        isSelecting = true;
+        setSelection(row, col, row, col);
+        document.body.classList.add("selection-lock");
+        event.preventDefault();
+      });
+
+      tableBody.addEventListener("mouseover", (event) => {
+        if (!isSelecting || !selection) return;
+        const cell = event.target.closest("td[data-row-index][data-col-index]");
+        if (!cell) return;
+        const row = parseInt(cell.dataset.rowIndex, 10);
+        const col = parseInt(cell.dataset.colIndex, 10);
+        if (!Number.isFinite(row) || !Number.isFinite(col)) return;
+        setSelection(selection.anchorRow, selection.anchorCol, row, col);
+      });
+
+      document.addEventListener("mousemove", (event) => {
+        if (!isDraggingSelection || !selection) return;
+
+        const row = getRowIndexFromPointer(event.clientX, event.clientY);
+        if (row !== null) {
+          const blockSize = selection.endRow - selection.startRow + 1;
+          const maxStart = Math.max(0, rows.length - blockSize);
+          dragTargetStartRow = Math.max(0, Math.min(row, maxStart));
+          applyDropPreviewAt(dragTargetStartRow);
+        }
+
+        const wrapRect = sheetWrap.getBoundingClientRect();
+        if (event.clientY < wrapRect.top + 26) {
+          sheetWrap.scrollTop -= 12;
+        } else if (event.clientY > wrapRect.bottom - 26) {
+          sheetWrap.scrollTop += 12;
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        if (isDraggingSelection) {
+          if (selection && dragTargetStartRow !== null) {
+            moveSelectionBlockTo(dragTargetStartRow);
+          }
+          isDraggingSelection = false;
+          dragTargetStartRow = null;
+          clearDropPreviewStyles();
+        }
+        isSelecting = false;
+        document.body.classList.remove("selection-lock");
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (!selection) return;
+        const focused = document.activeElement;
+        const isEditingField = focused instanceof HTMLInputElement || focused instanceof HTMLSelectElement || focused === projectTitleInput;
+
+        if (event.key === "Escape") {
+          if (isEditingField && focused !== projectTitleInput) {
+            focused.blur();
+            return;
+          }
+          isDraggingSelection = false;
+          dragTargetStartRow = null;
+          clearDropPreviewStyles();
+          selection = null;
+          applySelectionStyles();
+          return;
+        }
+
+        if (event.key === "Delete" || event.key === "Backspace") {
+          // Spreadsheet behavior: when a range is selected, Delete clears the range
+          // even if one of the editable cells is currently focused.
+          event.preventDefault();
+          if (isEditingField && focused !== projectTitleInput) {
+            focused.blur();
+          }
+          clearSelectedEditableCells();
+          return;
+        }
+
+        if (event.altKey && event.key === "ArrowUp") {
+          event.preventDefault();
+          moveSelectionBlockTo(selection.startRow - 1);
+          return;
+        }
+
+        if (event.altKey && event.key === "ArrowDown") {
+          event.preventDefault();
+          moveSelectionBlockTo(selection.startRow + 1);
+        }
+      });
+
+      sheetWrap.addEventListener("scroll", () => {
+        const nearBottom = sheetWrap.scrollTop + sheetWrap.clientHeight >= sheetWrap.scrollHeight - 200;
+        if (nearBottom) {
+          appendRows(ROW_BATCH_SIZE);
+        }
+      });
+
+      document.addEventListener("visibilitychange", async () => {
+        if (document.visibilityState !== "visible") return;
+        try {
+          await loadCategoriesAndDefault();
+          renderRows();
+        } catch (_error) {
+          // Keep current data rendered when refresh fails.
+        }
+      });
+
+      projectTitleInput.addEventListener("input", () => {
+        const nextName = projectTitleInput.value;
+        if (!nextName.trim()) return;
+        persistProjectRename(nextName, false);
+      });
+
+      projectTitleInput.addEventListener("blur", () => {
+        persistProjectRename(projectTitleInput.value, true);
+      });
+
+      projectTitleInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          projectTitleInput.blur();
+        }
+      });
+    }
+
+    async function initProject() {
+      try {
+        const loadedProject = await loadProject();
+        project = loadedProject;
+      } catch (_error) {
+        emptyState.style.display = "block";
+        sheetWrap.style.display = "none";
+        statusText.textContent = "Gagal memuat project";
+        return;
+      }
+
+      if (!project) {
+        emptyState.style.display = "block";
+        sheetWrap.style.display = "none";
+        statusText.textContent = "Project tidak ditemukan";
+        return;
+      }
+
+      try {
+        await loadCategoriesAndDefault();
+      } catch (_error) {
+        statusText.textContent = "Gagal memuat data kategori";
+      }
+
+      applyProjectMeta();
+      buildHeader();
+      applyTheme(currentStore);
+
+      try {
+        const savedRows = await readRows();
+        rows = savedRows;
+      } catch (_error) {
+        rows = [];
+        statusText.textContent = "Gagal memuat baris project";
+      }
+      ensureMinimumRows();
+      renderRows();
+      bindEvents();
+    }
+
+    initProject();
+  </script>
+</body>
+</html>

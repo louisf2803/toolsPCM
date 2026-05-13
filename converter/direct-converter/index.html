@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Price Engine - Technosify & IT Point</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --border: #30363d;
+      --deduction: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.35rem;
+    }
+
+    .header .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .back-link:hover {
+      border-color: #22d3ee;
+      color: #22d3ee;
+    }
+
+    /* Store tabs with icons */
+    .store-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--card);
+      padding: 0.4rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .store-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .store-tab:hover {
+      color: var(--text);
+    }
+
+    .store-tab.active {
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .store-tab svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    body.theme-technosify .store-tab.active {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    }
+
+    body.theme-technosify .store-tab.active svg { color: #a5f3fc; }
+
+    body.theme-itpoint .store-tab.active {
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    }
+
+    body.theme-itpoint .store-tab.active svg { color: #bfdbfe; }
+
+    /* Mode tabs - underline style */
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 0.7rem 0.5rem;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .mode-tab:hover {
+      color: var(--text);
+    }
+
+    .mode-tab.active {
+      color: #fff;
+      border-bottom-color: currentColor;
+    }
+
+    body.theme-technosify .mode-tab.active {
+      border-bottom-color: #22d3ee;
+      color: #22d3ee;
+    }
+
+    body.theme-itpoint .mode-tab.active {
+      border-bottom-color: #60a5fa;
+      color: #60a5fa;
+    }
+
+    .panel {
+      display: none;
+      animation: fade 0.25s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-section label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-section select,
+    .input-section input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-family: inherit;
+      font-size: 1.25rem;
+      border: 2px solid rgba(126, 156, 189, 0.62);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #1a2a40 0%, #16263b 100%);
+      color: #f2f8ff;
+      transition: border-color 0.2s;
+    }
+
+    .input-section select {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.7rem;
+      cursor: pointer;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    .input-section select option {
+      background: #102035;
+      color: #f4f9ff;
+      font-weight: 600;
+    }
+
+    .input-section select:focus,
+    .input-section input:focus {
+      outline: none;
+    }
+
+    body.theme-technosify .input-section select:focus,
+    body.theme-technosify .input-section input:focus {
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+    }
+
+    body.theme-itpoint .input-section select:focus,
+    body.theme-itpoint .input-section input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+    }
+
+    .input-section .helper {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* Two panels side by side */
+    .output-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 560px) {
+      .output-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .output-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+
+    body.theme-technosify .output-card:first-child {
+      border-top: 3px solid #22d3ee;
+    }
+
+    body.theme-technosify .output-card:last-child {
+      border-top: 3px solid #22d3ee;
+    }
+
+    body.theme-itpoint .output-card:first-child {
+      border-top: 3px solid #60a5fa;
+    }
+
+    body.theme-itpoint .output-card:last-child {
+      border-top: 3px solid #60a5fa;
+    }
+
+    .output-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .output-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .output-card-icon.tokped {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .output-card-icon.shopee {
+      background: #f56a19;
+      color: var(--text);
+    }
+
+    .output-card-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .output-card-title-wrap {
+      flex: 1;
+    }
+
+    .output-card-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .output-card-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-top: 0.2rem;
+    }
+
+    .output-card-tag.mall {
+      background: #8100fa;
+      color: #fff;
+    }
+
+    .output-card-tag.regular {
+      background: #3d3b30;
+      color: var(--text-muted);
+    }
+
+    .output-net-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .output-net-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    body.theme-technosify .output-net-value {
+      color: #22d3ee;
+    }
+
+    body.theme-itpoint .output-net-value {
+      color: #60a5fa;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0;
+      font-size: 0.85rem;
+    }
+
+    .breakdown-row .label {
+      color: var(--text-muted);
+    }
+
+    .breakdown-row .value {
+      font-weight: 500;
+    }
+
+    .breakdown-row.total-deductions {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .breakdown-row.total-deductions .value {
+      color: var(--deduction);
+    }
+
+    .breakdown-row.base-price .value {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body class="theme-technosify">
+  <div class="container">
+    <a class="back-link" href="/converter">
+      <span aria-hidden="true">&#8592;</span>
+      Kembali ke Menu
+    </a>
+    <header class="header">
+      <h1>Price Engine</h1>
+      <p class="subtitle">Multi-platform fee calculator & profit analysis</p>
+    </header>
+
+    <div class="store-tabs">
+      <button type="button" class="store-tab active" data-store="technosify">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Technosify
+      </button>
+      <button type="button" class="store-tab" data-store="itpoint">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        IT Point
+      </button>
+    </div>
+
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" data-mode="market-to-net">MARKETPLACE >> NET INCOME</button>
+      <button type="button" class="mode-tab" data-mode="net-to-market">NET INCOME >> MARKETPLACE</button>
+    </div>
+
+    <!-- Panel: Marketplace price -> Net income (both platforms visible) -->
+    <div id="panel-market-to-net" class="panel active">
+      <div class="input-section">
+        <label for="category-m2n">PILIH KATEGORI FEE</label>
+        <select id="category-m2n" autocomplete="off">
+          <option value="">Belum ada kategori - atur dulu di fee kategori</option>
+        </select>
+        <label for="price-m2n">INPUT MARKETPLACE PRICE (IDR)</label>
+        <input type="text" id="price-m2n" placeholder="Rp 0" inputmode="numeric" autocomplete="off">
+        <p class="helper">Enter the price displayed to customers</p>
+      </div>
+      <div class="output-grid">
+        <div class="output-card" id="card-tokped-m2n">
+          <div class="output-card-header">
+            <div class="output-card-icon tokped">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="output-card-title-wrap">
+              <div class="output-card-title">Tokopedia</div>
+              <span class="output-card-tag mall" id="tag-tokped-m2n">MALL</span>
+            </div>
+          </div>
+          <div style="border-bottom: 1px dashed rgba(126, 156, 189, 0.4); padding-bottom: 1rem; margin-bottom: 1rem;">
+            <div class="output-net-label">SEBELUM 18 MEI (4%)</div>
+            <div class="output-net-value" id="net-tokped-m2n-old">Rp 0</div>
+            <div id="breakdown-tokped-m2n-old"></div>
+          </div>
+          <div>
+            <div class="output-net-label" style="color: #6ee7b7;">SETELAH 18 MEI (3%)</div>
+            <div class="output-net-value" id="net-tokped-m2n-new">Rp 0</div>
+            <div id="breakdown-tokped-m2n-new"></div>
+          </div>
+        </div>
+        <div class="output-card" id="card-shopee-m2n">
+          <div class="output-card-header">
+            <div class="output-card-icon shopee">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div class="output-card-title-wrap">
+              <div class="output-card-title">Shopee</div>
+              <span class="output-card-tag regular">REGULAR</span>
+            </div>
+          </div>
+          <div class="output-net-label">NET INCOME</div>
+          <div class="output-net-value" id="net-shopee-m2n">Rp 0</div>
+          <div id="breakdown-shopee-m2n"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel: Net income -> Marketplace price (both platforms visible) -->
+    <div id="panel-net-to-market" class="panel">
+      <div class="input-section">
+        <label for="category-n2m">PILIH KATEGORI FEE</label>
+        <select id="category-n2m" autocomplete="off">
+          <option value="">Belum ada kategori - atur dulu di fee kategori</option>
+        </select>
+        <label for="net-n2m">INPUT DESIRED NET INCOME (IDR)</label>
+        <input type="text" id="net-n2m" placeholder="Rp 0" inputmode="numeric" autocomplete="off">
+        <p class="helper">Enter the net income you want to receive</p>
+      </div>
+      <div class="output-grid">
+        <div class="output-card" id="card-tokped-n2m">
+          <div class="output-card-header">
+            <div class="output-card-icon tokped">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <div class="output-card-title-wrap">
+              <div class="output-card-title">Tokopedia</div>
+              <span class="output-card-tag mall" id="tag-tokped-n2m">MALL</span>
+            </div>
+          </div>
+          <div style="border-bottom: 1px dashed rgba(126, 156, 189, 0.4); padding-bottom: 1rem; margin-bottom: 1rem;">
+            <div class="output-net-label">LIST PRICE - SEBELUM 18 MEI (4%)</div>
+            <div class="output-net-value" id="price-tokped-n2m-old">Rp 0</div>
+            <div id="breakdown-tokped-n2m-old"></div>
+          </div>
+          <div>
+            <div class="output-net-label" style="color: #6ee7b7;">LIST PRICE - SETELAH 18 MEI (3%)</div>
+            <div class="output-net-value" id="price-tokped-n2m-new">Rp 0</div>
+            <div id="breakdown-tokped-n2m-new"></div>
+          </div>
+        </div>
+        <div class="output-card" id="card-shopee-n2m">
+          <div class="output-card-header">
+            <div class="output-card-icon shopee">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div class="output-card-title-wrap">
+              <div class="output-card-title">Shopee</div>
+              <span class="output-card-tag regular">REGULAR</span>
+            </div>
+          </div>
+          <div class="output-net-label">LIST PRICE</div>
+          <div class="output-net-value" id="price-shopee-n2m">Rp 0</div>
+          <div id="breakdown-shopee-n2m"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://chvmmyhxmyzbspieqway.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNodm1teWh4bXl6YnNwaWVxd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NzY4NDgsImV4cCI6MjA4NjU1Mjg0OH0.pyHGGh43arTqs8Oc8AOXLPDB_ldk1MYErRBIuF1kv5E";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const CATEGORY_TABLE = "categories";
+    const SETTINGS_TABLE = "app_settings";
+    const DEFAULT_SERVICE_FEE_RATE = {
+      technosify: { tokped: 0.025, shopee: 0.045 },
+      itpoint: { tokped: 0.0425, shopee: 0.045 },
+    };
+    const fmt = (n) => new Intl.NumberFormat('id-ID', { style: 'decimal', maximumFractionDigits: 0 }).format(n);
+
+    function getStore() {
+      return document.querySelector('.store-tab.active').dataset.store;
+    }
+
+    function parseIdrInput(value) {
+      const raw = String(value).replace(/[^\d]/g, '');
+      return parseInt(raw, 10) || 0;
+    }
+
+    function formatPercent(value) {
+      return Number(value).toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    let categorySettingsCache = [];
+    let defaultCategoryIdCache = "";
+
+    async function loadCategorySettings() {
+      const { data, error } = await db
+        .from(CATEGORY_TABLE)
+        .select('id,name,tokped_mall_fee,tokped_regular_fee,shopee_fee')
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      categorySettingsCache = (data || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        tokpedMallFee: Number(item.tokped_mall_fee) || 0,
+        tokpedRegularFee: Number(item.tokped_regular_fee) || 0,
+        shopeeFee: Number(item.shopee_fee) || 0,
+      }));
+    }
+
+    async function loadDefaultCategoryId() {
+      const { data, error } = await db
+        .from(SETTINGS_TABLE)
+        .select("default_category_id")
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) {
+        defaultCategoryIdCache = "";
+        return;
+      }
+      defaultCategoryIdCache = data?.default_category_id || "";
+    }
+
+    function populateCategoryDropdowns() {
+      const items = categorySettingsCache;
+      const dropdownM2N = document.getElementById('category-m2n');
+      const dropdownN2M = document.getElementById('category-n2m');
+      const selectedValue = dropdownM2N.value || dropdownN2M.value || '';
+      const defaultCategoryId = defaultCategoryIdCache;
+
+      [dropdownM2N, dropdownN2M].forEach((dropdown) => {
+        dropdown.innerHTML = '';
+        if (!items.length) {
+          dropdown.add(new Option('Belum ada kategori - atur dulu di fee kategori', ''));
+          return;
+        }
+        items.forEach((item) => {
+          dropdown.add(new Option(item.name, item.id));
+        });
+      });
+
+      if (!items.length) {
+        dropdownM2N.value = '';
+        dropdownN2M.value = '';
+        return;
+      }
+
+      const hasSelected = items.some((item) => item.id === selectedValue);
+      const hasDefault = items.some((item) => item.id === defaultCategoryId);
+      const nextValue = hasSelected ? selectedValue : (hasDefault ? defaultCategoryId : items[0].id);
+      dropdownM2N.value = nextValue;
+      dropdownN2M.value = nextValue;
+    }
+
+    function getSelectedCategory() {
+      const selectedId = document.getElementById('category-m2n').value || document.getElementById('category-n2m').value;
+      if (!selectedId) return null;
+      const categories = categorySettingsCache;
+      return categories.find((item) => item.id === selectedId) || null;
+    }
+
+    function getServiceFeeRate(store, marketplace, selectedCategory) {
+      const defaultRate = DEFAULT_SERVICE_FEE_RATE[store]?.[marketplace] ?? 0;
+      if (!selectedCategory) return defaultRate;
+
+      let feePercent = null;
+      if (marketplace === 'tokped') {
+        feePercent = store === 'technosify' ? selectedCategory.tokpedMallFee : selectedCategory.tokpedRegularFee;
+      } else if (marketplace === 'shopee') {
+        feePercent = selectedCategory.shopeeFee;
+      }
+
+      const parsed = Number(feePercent);
+      if (!Number.isFinite(parsed) || parsed < 0) return defaultRate;
+      return parsed / 100;
+    }
+
+    // Saat mengetik: format langsung dengan pemisah ribuan
+    function normalizeIdrInput(el) {
+      const raw = String(el.value).replace(/\D/g, '');
+      const newValue = raw === '' ? '' : 'Rp ' + fmt(parseInt(raw, 10));
+      if (el.value !== newValue) {
+        el.value = newValue;
+        el.setSelectionRange(newValue.length, newValue.length);
+      }
+    }
+
+    // Saat blur: tampilkan format cantik dengan pemisah ribuan
+    function formatIdrOnBlur(el) {
+      const raw = String(el.value).replace(/\D/g, '');
+      if (raw === '') {
+        el.value = '';
+        return;
+      }
+      const num = parseInt(raw, 10);
+      el.value = 'Rp ' + fmt(num);
+    }
+
+    function feesTokpedMallBefore(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xbp = Math.min(0.035 * harga, 60000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
+          { label: 'Service Cost (1.8%, max 50k)', value: biayaJasa },
+          { label: 'Dynamic Comm (4%, max 40k)', value: komisiDinamis },
+          { label: 'XBP (3.5%, max 60k)', value: xbp },
+          { label: 'Transaction Fee', value: biayaTransaksi },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedMallAfter(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.03 * harga, 650000);
+      const xbp = Math.min(0.035 * harga, 60000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
+          { label: 'Service Cost (1.8%, max 50k)', value: biayaJasa },
+          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
+          { label: 'XBP (3.5%, max 60k)', value: xbp },
+          { label: 'Transaction Fee', value: biayaTransaksi },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedBiasaBefore(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xboost = Math.min(0.035 * harga, 60000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: komisi },
+          { label: 'Dynamic Comm (4%, max 40k)', value: komisiDinamis },
+          { label: 'XBoost (3.5%, max 60k)', value: xboost },
+          { label: 'Biaya proses', value: biayaProses },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedBiasaAfter(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.03 * harga, 650000);
+      const xboost = Math.min(0.035 * harga, 60000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: komisi },
+          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
+          { label: 'XBoost (3.5%, max 60k)', value: xboost },
+          { label: 'Biaya proses', value: biayaProses },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesShopeeBiasa(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const promoXtra = Math.min(0.045 * harga, 60000);
+      const ongkirXtra = Math.min(0.06 * harga, 40000);
+      const asuransi = 0.005 * harga;
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + promoXtra + ongkirXtra + asuransi + biayaTransaksi;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
+          { label: 'Promo Xtra (4.5%, max 60k)', value: promoXtra },
+          { label: 'Ongkir Xtra (6%, max 40k)', value: ongkirXtra },
+          { label: 'Insurance (0.5%)', value: asuransi },
+          { label: 'Transaction Fee', value: biayaTransaksi },
+        ],
+        totalFee,
+      };
+    }
+
+    function calcNet(store, marketplace, harga, selectedCategory, period = 'before') {
+      const serviceFeeRate = getServiceFeeRate(store, marketplace, selectedCategory);
+      if (store === 'technosify' && marketplace === 'tokped') return period === 'before' ? feesTokpedMallBefore(harga, serviceFeeRate) : feesTokpedMallAfter(harga, serviceFeeRate);
+      if (store === 'technosify' && marketplace === 'shopee') return feesShopeeBiasa(harga, serviceFeeRate);
+      if (store === 'itpoint' && marketplace === 'tokped') return period === 'before' ? feesTokpedBiasaBefore(harga, serviceFeeRate) : feesTokpedBiasaAfter(harga, serviceFeeRate);
+      if (store === 'itpoint' && marketplace === 'shopee') return feesShopeeBiasa(harga, serviceFeeRate);
+      return { net: 0, basePrice: harga, items: [], totalFee: 0 };
+    }
+
+    function findPriceForNet(store, marketplace, targetNet, selectedCategory, period = 'before') {
+      if (targetNet <= 0) return { harga: 0, ...calcNet(store, marketplace, 0, selectedCategory, period) };
+      let low = targetNet;
+      let high = targetNet * 3;
+      while (calcNet(store, marketplace, high, selectedCategory, period).net < targetNet) high *= 2;
+      for (let i = 0; i < 80; i++) {
+        const mid = (low + high) / 2;
+        const { net } = calcNet(store, marketplace, mid, selectedCategory, period);
+        if (Math.abs(net - targetNet) < 1) {
+          const finalHarga = Math.round(mid);
+          return { harga: finalHarga, ...calcNet(store, marketplace, finalHarga, selectedCategory, period) };
+        }
+        if (net < targetNet) low = mid;
+        else high = mid;
+      }
+      const finalHarga = Math.round((low + high) / 2);
+      return { harga: finalHarga, ...calcNet(store, marketplace, finalHarga, selectedCategory, period) };
+    }
+
+    function renderBreakdownM2N(container, data) {
+      if (!data.items || !data.items.length) {
+        container.innerHTML = '';
+        return;
+      }
+      let html = `<div class="breakdown-row base-price"><span class="label">Base Price</span><span class="value">Rp ${fmt(data.basePrice)}</span></div>`;
+      data.items.forEach(({ label, value }) => {
+        html += `<div class="breakdown-row"><span class="label">${label}</span><span class="value">Rp ${fmt(value)}</span></div>`;
+      });
+      html += `<div class="breakdown-row total-deductions"><span class="label">Total Deductions</span><span class="value">- Rp ${fmt(data.totalFee)}</span></div>`;
+      container.innerHTML = html;
+    }
+
+    function renderBreakdownN2M(container, data, listPrice) {
+      if (!data.items || !data.items.length) {
+        container.innerHTML = '';
+        return;
+      }
+      let html = `<div class="breakdown-row base-price"><span class="label">List Price</span><span class="value">Rp ${fmt(listPrice)}</span></div>`;
+      data.items.forEach(({ label, value }) => {
+        html += `<div class="breakdown-row"><span class="label">${label}</span><span class="value">- Rp ${fmt(value)}</span></div>`;
+      });
+      html += `<div class="breakdown-row total-deductions"><span class="label">Total Deductions</span><span class="value">- Rp ${fmt(data.totalFee)}</span></div>`;
+      html += `<div class="breakdown-row"><span class="label">Net Income</span><span class="value">Rp ${fmt(data.net)}</span></div>`;
+      container.innerHTML = html;
+    }
+
+    function updateM2N() {
+      const store = getStore();
+      const harga = parseIdrInput(document.getElementById('price-m2n').value);
+      const selectedCategory = getSelectedCategory();
+
+      const tokpedBefore = calcNet(store, 'tokped', harga, selectedCategory, 'before');
+      const tokpedAfter = calcNet(store, 'tokped', harga, selectedCategory, 'after');
+      const shopeeData = calcNet(store, 'shopee', harga, selectedCategory, 'before');
+
+      document.getElementById('net-tokped-m2n-old').textContent = 'Rp ' + fmt(tokpedBefore.net);
+      renderBreakdownM2N(document.getElementById('breakdown-tokped-m2n-old'), tokpedBefore);
+
+      document.getElementById('net-tokped-m2n-new').textContent = 'Rp ' + fmt(tokpedAfter.net);
+      renderBreakdownM2N(document.getElementById('breakdown-tokped-m2n-new'), tokpedAfter);
+
+      document.getElementById('net-shopee-m2n').textContent = 'Rp ' + fmt(shopeeData.net);
+      renderBreakdownM2N(document.getElementById('breakdown-shopee-m2n'), shopeeData);
+
+      document.getElementById('tag-tokped-m2n').textContent = store === 'technosify' ? 'MALL' : 'REGULAR';
+      document.getElementById('tag-tokped-m2n').className = 'output-card-tag ' + (store === 'technosify' ? 'mall' : 'regular');
+    }
+
+    function updateN2M() {
+      const store = getStore();
+      const targetNet = parseIdrInput(document.getElementById('net-n2m').value);
+      const selectedCategory = getSelectedCategory();
+
+      const tokpedBefore = findPriceForNet(store, 'tokped', targetNet, selectedCategory, 'before');
+      const tokpedAfter = findPriceForNet(store, 'tokped', targetNet, selectedCategory, 'after');
+      const shopeeResult = findPriceForNet(store, 'shopee', targetNet, selectedCategory, 'before');
+
+      document.getElementById('price-tokped-n2m-old').textContent = 'Rp ' + fmt(tokpedBefore.harga);
+      renderBreakdownN2M(document.getElementById('breakdown-tokped-n2m-old'), tokpedBefore, tokpedBefore.harga);
+
+      document.getElementById('price-tokped-n2m-new').textContent = 'Rp ' + fmt(tokpedAfter.harga);
+      renderBreakdownN2M(document.getElementById('breakdown-tokped-n2m-new'), tokpedAfter, tokpedAfter.harga);
+
+      document.getElementById('price-shopee-n2m').textContent = 'Rp ' + fmt(shopeeResult.harga);
+      renderBreakdownN2M(document.getElementById('breakdown-shopee-n2m'), shopeeResult, shopeeResult.harga);
+
+      document.getElementById('tag-tokped-n2m').textContent = store === 'technosify' ? 'MALL' : 'REGULAR';
+      document.getElementById('tag-tokped-n2m').className = 'output-card-tag ' + (store === 'technosify' ? 'mall' : 'regular');
+    }
+
+    document.querySelectorAll('.store-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.store-tab').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.body.className = btn.dataset.store === 'technosify' ? 'theme-technosify' : 'theme-itpoint';
+        updateM2N();
+        updateN2M();
+      });
+    });
+
+    document.querySelectorAll('.mode-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-tab').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-market-to-net').classList.toggle('active', btn.dataset.mode === 'market-to-net');
+        document.getElementById('panel-net-to-market').classList.toggle('active', btn.dataset.mode === 'net-to-market');
+      });
+    });
+
+    const priceInput = document.getElementById('price-m2n');
+    const netInput = document.getElementById('net-n2m');
+    const categoryM2N = document.getElementById('category-m2n');
+    const categoryN2M = document.getElementById('category-n2m');
+
+    priceInput.addEventListener('input', () => {
+      normalizeIdrInput(priceInput);
+      updateM2N();
+    });
+    priceInput.addEventListener('blur', () => formatIdrOnBlur(priceInput));
+
+    netInput.addEventListener('input', () => {
+      normalizeIdrInput(netInput);
+      updateN2M();
+    });
+    netInput.addEventListener('blur', () => formatIdrOnBlur(netInput));
+
+    categoryM2N.addEventListener('change', () => {
+      categoryN2M.value = categoryM2N.value;
+      updateM2N();
+      updateN2M();
+    });
+
+    categoryN2M.addEventListener('change', () => {
+      categoryM2N.value = categoryN2M.value;
+      updateM2N();
+      updateN2M();
+    });
+
+    async function initPage() {
+      try {
+        await Promise.all([loadCategorySettings(), loadDefaultCategoryId()]);
+        populateCategoryDropdowns();
+      } catch (_error) {
+        // Keep calculator usable with built-in defaults if DB is unavailable.
+      }
+      updateM2N();
+      updateN2M();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

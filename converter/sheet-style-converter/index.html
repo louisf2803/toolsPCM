@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sheet Style Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030e1f;
+      --panel: #f4f4f4;
+      --panel-text: #787878;
+      --brand: #3cb3d3;
+      --white: #ffffff;
+      --title: #35afd3;
+      --modal-overlay: rgba(3, 14, 31, 0.72);
+      --modal-bg: #0d1829;
+      --modal-border: rgba(60, 179, 211, 0.32);
+      --input-bg: #0a1220;
+      --input-border: rgba(255, 255, 255, 0.18);
+      --input-text: #e7eef7;
+      --muted: #92a7bd;
+      --danger: #f87171;
+      --project-key: "sheetStyleConverterProjects";
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "DM Sans", sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      padding: 2.2rem 1rem 2.5rem;
+    }
+
+    .page {
+      width: min(1220px, 100%);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 1.7rem;
+    }
+
+    .top-nav {
+      display: inline-flex;
+      margin-bottom: 0.95rem;
+    }
+
+    .page-header h1 {
+      color: var(--title);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .sheet-grid {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+
+    .tile {
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 105px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: inherit;
+    }
+
+    .project-tile {
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+      position: relative;
+    }
+
+    .project-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(60, 179, 211, 0.15);
+    }
+
+    .tile-preview {
+      min-height: 72px;
+      background: var(--panel);
+      color: var(--panel-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 500;
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    .project-delete-btn {
+      position: absolute;
+      top: 0.36rem;
+      right: 0.38rem;
+      width: 22px;
+      height: 22px;
+      border: none;
+      border-radius: 999px;
+      background: rgba(19, 27, 39, 0.8);
+      color: #fca5a5;
+      font-size: 0.92rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+      opacity: 0;
+    }
+
+    .project-tile:hover .project-delete-btn,
+    .project-delete-btn:focus-visible {
+      opacity: 1;
+    }
+
+    .project-delete-btn:hover {
+      background: #7f1d1d;
+      color: #fee2e2;
+      transform: scale(1.04);
+    }
+
+    .tile-label {
+      min-height: 33px;
+      background: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      font-size: 0.77rem;
+      font-weight: 600;
+      padding: 0 0.8rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .new-project {
+      background: transparent;
+      border: 3px dashed var(--brand);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      min-height: 105px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.12rem;
+      border-radius: 12px;
+      color: inherit;
+      font-family: inherit;
+    }
+
+    .new-project:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(60, 179, 211, 0.19);
+    }
+
+    .new-project:focus-visible {
+      outline: 2px solid var(--white);
+      outline-offset: 3px;
+    }
+
+    .new-project .plus {
+      color: var(--brand);
+      font-size: 3rem;
+      line-height: 1;
+      font-weight: 600;
+    }
+
+    .new-project .text {
+      color: var(--brand);
+      font-size: 1.05rem;
+      font-weight: 500;
+    }
+
+    .back-link {
+      display: inline-flex;
+      margin-top: 1.5rem;
+      color: #98aac0;
+      text-decoration: none;
+      font-size: 0.88rem;
+      border: 1px solid rgba(152, 170, 192, 0.34);
+      border-radius: 999px;
+      padding: 0.42rem 0.82rem;
+      transition: border-color 0.18s ease, color 0.18s ease;
+    }
+
+    .back-link:hover {
+      border-color: var(--brand);
+      color: var(--white);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--modal-overlay);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 20;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      width: min(460px, 100%);
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      border-radius: 15px;
+      padding: 1.2rem;
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.42);
+    }
+
+    .modal h2 {
+      font-size: 1.14rem;
+      margin-bottom: 0.22rem;
+    }
+
+    .modal p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      margin-bottom: 0.9rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.86rem;
+      margin-bottom: 0.42rem;
+      color: #d7e3f2;
+      font-weight: 500;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--input-text);
+      padding: 0.65rem 0.78rem;
+      font-family: inherit;
+      font-size: 0.89rem;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--brand);
+    }
+
+    .error {
+      min-height: 1.25rem;
+      color: var(--danger);
+      font-size: 0.82rem;
+    }
+
+    .modal-actions {
+      margin-top: 0.4rem;
+      display: flex;
+      gap: 0.6rem;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 9px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      padding: 0.6rem 0.95rem;
+    }
+
+    .btn-cancel {
+      background: #223247;
+      color: #c3d0de;
+    }
+
+    .btn-save {
+      background: var(--brand);
+      color: var(--white);
+    }
+
+    @media (max-width: 520px) {
+      .sheet-grid {
+        grid-template-columns: repeat(2, minmax(130px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a href="/converter" class="back-link top-nav">kembali ke menu</a>
+
+    <header class="page-header">
+      <h1>SHEETS CALCULATOR</h1>
+    </header>
+
+    <section class="sheet-grid" id="sheetGrid">
+      <button class="new-project" id="openCreateProjectModal" type="button">
+        <span class="plus">+</span>
+        <span class="text">New Project</span>
+      </button>
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="createProjectModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="createProjectTitle">
+      <h2 id="createProjectTitle">Buat Project Baru</h2>
+      <p>Masukkan nama file dan pilih tipe converter project.</p>
+
+      <form id="createProjectForm">
+        <div class="field">
+          <label for="projectNameInput">Nama File</label>
+          <input id="projectNameInput" name="projectName" type="text" placeholder="Contoh: Oktober - Toko A" autocomplete="off" required>
+        </div>
+
+        <div class="field">
+          <label for="projectTypeInput">Tipe Converter</label>
+          <select id="projectTypeInput" name="projectType" required>
+            <option value="">Pilih tipe converter</option>
+            <option value="marketplace_to_net_income">Marketplace -> Net Income</option>
+            <option value="net_income_to_marketplace">Net Income -> Marketplace</option>
+          </select>
+        </div>
+
+        <div class="error" id="formError"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-cancel" id="cancelCreateProject">Batal</button>
+          <button type="submit" class="btn btn-save">Buat Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://chvmmyhxmyzbspieqway.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNodm1teWh4bXl6YnNwaWVxd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NzY4NDgsImV4cCI6MjA4NjU1Mjg0OH0.pyHGGh43arTqs8Oc8AOXLPDB_ldk1MYErRBIuF1kv5E";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const PROJECT_TABLE = "projects";
+    const openModalButton = document.getElementById("openCreateProjectModal");
+    const modal = document.getElementById("createProjectModal");
+    const form = document.getElementById("createProjectForm");
+    const cancelButton = document.getElementById("cancelCreateProject");
+    const projectNameInput = document.getElementById("projectNameInput");
+    const projectTypeInput = document.getElementById("projectTypeInput");
+    const formError = document.getElementById("formError");
+    const sheetGrid = document.getElementById("sheetGrid");
+
+    function getTypeLabel(type) {
+      return type === "marketplace_to_net_income"
+        ? "Marketplace -> Net Income"
+        : "Net Income -> Marketplace";
+    }
+
+    let projectsCache = [];
+
+    async function loadProjects() {
+      const { data, error } = await db
+        .from(PROJECT_TABLE)
+        .select("id,name,type,created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      projectsCache = (data || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        createdAt: item.created_at
+      }));
+    }
+
+    function createProjectTile(project) {
+      const tile = document.createElement("article");
+      tile.className = "tile project-tile";
+      tile.dataset.projectId = project.id;
+      tile.innerHTML = `
+        <button class="project-delete-btn" type="button" aria-label="Hapus project ${project.name}">×</button>
+        <div class="tile-preview">${getTypeLabel(project.type)}</div>
+        <div class="tile-label">${project.name}</div>
+      `;
+
+      tile.addEventListener("click", () => {
+        const target = new URL("/converter/sheet-project/", window.location.origin);
+        target.searchParams.set("projectId", project.id);
+        window.location.href = target.toString();
+      });
+
+      const deleteButton = tile.querySelector(".project-delete-btn");
+      deleteButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const confirmed = window.confirm(`Hapus project "${project.name}"?`);
+        if (!confirmed) return;
+        deleteProject(project.id);
+      });
+
+      return tile;
+    }
+
+    async function deleteProject(projectId) {
+      try {
+        const { error } = await db.from(PROJECT_TABLE).delete().eq("id", projectId);
+        if (error) throw error;
+        await renderProjects();
+      } catch (_error) {
+        formError.textContent = "Gagal menghapus project dari database.";
+      }
+    }
+
+    async function renderProjects() {
+      const oldTiles = sheetGrid.querySelectorAll(".project-tile");
+      oldTiles.forEach((tile) => tile.remove());
+
+      await loadProjects();
+      projectsCache.forEach((project) => {
+        sheetGrid.appendChild(createProjectTile(project));
+      });
+    }
+
+    function openModal() {
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
+      formError.textContent = "";
+      projectNameInput.value = "";
+      projectTypeInput.value = "";
+      setTimeout(() => projectNameInput.focus(), 10);
+    }
+
+    function closeModal() {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden", "true");
+      openModalButton.focus();
+    }
+
+    openModalButton.addEventListener("click", openModal);
+    cancelButton.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.classList.contains("show")) {
+        closeModal();
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const projectName = projectNameInput.value.trim();
+      const projectType = projectTypeInput.value;
+
+      if (!projectName) {
+        formError.textContent = "Nama file wajib diisi.";
+        projectNameInput.focus();
+        return;
+      }
+
+      if (!projectType) {
+        formError.textContent = "Pilih tipe converter terlebih dahulu.";
+        projectTypeInput.focus();
+        return;
+      }
+
+      try {
+        const newProject = {
+          id: window.crypto?.randomUUID?.() || Date.now().toString(),
+          name: projectName,
+          type: projectType
+        };
+        const { error } = await db.from(PROJECT_TABLE).insert(newProject);
+        if (error) throw error;
+        await renderProjects();
+        closeModal();
+      } catch (_error) {
+        formError.textContent = "Gagal membuat project.";
+      }
+    });
+
+    renderProjects().catch(() => {
+      formError.textContent = "Gagal memuat project dari database.";
+    });
+  </script>
+</body>
+</html>
