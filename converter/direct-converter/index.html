@@ -707,10 +707,11 @@
     function feesTokpedMallAfter(harga, serviceFeeRate) {
       const biayaLayanan = serviceFeeRate * harga;
       const biayaJasa = Math.min(0.018 * harga, 50000);
-      const komisiDinamis = Math.min(0.03 * harga, 650000);
-      const xbp = Math.min(0.035 * harga, 60000);
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xbp = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
       const biayaTransaksi = 1250;
-      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + xbpSuper + biayaTransaksi;
       const net = harga - totalFee;
       return {
         net,
@@ -718,8 +719,9 @@
         items: [
           { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
           { label: 'Service Cost (1.8%, max 50k)', value: biayaJasa },
-          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
-          { label: 'XBP (3.5%, max 60k)', value: xbp },
+          { label: 'Dynamic Comm (4%, max 650k)', value: komisiDinamis },
+          { label: 'XBP (2.5%)', value: xbp },
+          { label: 'XBP Super (2%, max 20k)', value: xbpSuper },
           { label: 'Transaction Fee', value: biayaTransaksi },
         ],
         totalFee,
@@ -748,18 +750,20 @@
 
     function feesTokpedBiasaAfter(harga, serviceFeeRate) {
       const komisi = serviceFeeRate * harga;
-      const komisiDinamis = Math.min(0.03 * harga, 650000);
-      const xboost = Math.min(0.035 * harga, 60000);
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xboost = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
       const biayaProses = 1250;
-      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      const totalFee = komisi + komisiDinamis + xboost + xbpSuper + biayaProses;
       const net = harga - totalFee;
       return {
         net,
         basePrice: harga,
         items: [
           { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: komisi },
-          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
-          { label: 'XBoost (3.5%, max 60k)', value: xboost },
+          { label: 'Dynamic Comm (4%, max 650k)', value: komisiDinamis },
+          { label: 'XBoost (2.5%)', value: xboost },
+          { label: 'XBP Super (2%, max 20k)', value: xbpSuper },
           { label: 'Biaya proses', value: biayaProses },
         ],
         totalFee,

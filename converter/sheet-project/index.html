@@ -619,10 +619,11 @@
     function feesTokpedMallAfter(harga, serviceFeeRate) {
       const biayaLayanan = serviceFeeRate * harga;
       const biayaJasa = Math.min(0.018 * harga, 50000);
-      const komisiDinamis = Math.min(0.03 * harga, 650000);
-      const xbp = Math.min(0.035 * harga, 60000);
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xbp = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
       const biayaTransaksi = 1250;
-      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + xbpSuper + biayaTransaksi;
       return { net: harga - totalFee, totalFee };
     }
 
@@ -637,10 +638,11 @@
 
     function feesTokpedBiasaAfter(harga, serviceFeeRate) {
       const komisi = serviceFeeRate * harga;
-      const komisiDinamis = Math.min(0.03 * harga, 650000);
-      const xboost = Math.min(0.035 * harga, 60000);
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xboost = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
       const biayaProses = 1250;
-      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      const totalFee = komisi + komisiDinamis + xboost + xbpSuper + biayaProses;
       return { net: harga - totalFee, totalFee };
     }
 
