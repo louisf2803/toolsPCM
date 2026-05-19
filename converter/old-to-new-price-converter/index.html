@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Old to New Price Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --border: #30363d;
+      --deduction: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.35rem;
+    }
+
+    .header .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .back-link:hover {
+      border-color: #22d3ee;
+      color: #22d3ee;
+    }
+
+    .store-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--card);
+      padding: 0.4rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .store-tab {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .store-tab:hover {
+      color: var(--text);
+    }
+
+    .store-tab.active {
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .store-tab svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    body.theme-technosify .store-tab.active {
+      background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    }
+
+    body.theme-itpoint .store-tab.active {
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    }
+
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-section label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-section select,
+    .input-section input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-family: inherit;
+      font-size: 1.25rem;
+      border: 2px solid rgba(126, 156, 189, 0.62);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #1a2a40 0%, #16263b 100%);
+      color: #f2f8ff;
+      transition: border-color 0.2s;
+    }
+
+    .input-section select {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.7rem;
+      cursor: pointer;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+    }
+
+    .input-section select option {
+      background: #102035;
+      color: #f4f9ff;
+      font-weight: 600;
+    }
+
+    .input-section select:focus,
+    .input-section input:focus {
+      outline: none;
+    }
+
+    body.theme-technosify .input-section select:focus,
+    body.theme-technosify .input-section input:focus {
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+    }
+
+    body.theme-itpoint .input-section select:focus,
+    body.theme-itpoint .input-section input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+    }
+
+    .output-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 560px) {
+      .output-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .output-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    body.theme-technosify .output-card:first-child {
+      border-top: 3px solid #6ee7b7;
+    }
+
+    body.theme-technosify .output-card:last-child {
+      border-top: 3px solid #22d3ee;
+    }
+
+    body.theme-itpoint .output-card:first-child {
+      border-top: 3px solid #6ee7b7;
+    }
+
+    body.theme-itpoint .output-card:last-child {
+      border-top: 3px solid #60a5fa;
+    }
+
+    .output-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px dashed rgba(126, 156, 189, 0.4);
+    }
+
+    .output-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .output-card-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .output-card-title-wrap {
+      flex: 1;
+    }
+
+    .output-card-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .output-card-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-top: 0.2rem;
+    }
+
+    .output-card-tag.mall {
+      background: #8100fa;
+      color: #fff;
+    }
+
+    .output-card-tag.regular {
+      background: #3d3b30;
+      color: var(--text-muted);
+    }
+
+    .output-net-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .output-net-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .output-card:first-child .output-net-value {
+      color: #6ee7b7;
+    }
+
+    body.theme-technosify .output-card:last-child .output-net-value {
+      color: #22d3ee;
+    }
+
+    body.theme-itpoint .output-card:last-child .output-net-value {
+      color: #60a5fa;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0;
+      font-size: 0.85rem;
+    }
+
+    .breakdown-row .label {
+      color: var(--text-muted);
+    }
+
+    .breakdown-row .value {
+      font-weight: 500;
+    }
+
+    .breakdown-row.total-deductions {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .breakdown-row.total-deductions .value {
+      color: var(--deduction);
+    }
+
+    .breakdown-row.base-price .value {
+      color: var(--text);
+    }
+    
+    .arrow-icon {
+      position: absolute;
+      top: 50%;
+      right: -1.25rem;
+      transform: translateY(-50%);
+      width: 2.5rem;
+      height: 2.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      color: var(--text-muted);
+    }
+    
+    @media (max-width: 560px) {
+      .arrow-icon {
+        top: auto;
+        bottom: -1.25rem;
+        right: 50%;
+        transform: translateX(50%) rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body class="theme-technosify">
+  <div class="container">
+    <a class="back-link" href="/converter">
+      <span aria-hidden="true">&#8592;</span>
+      Kembali ke Menu
+    </a>
+    <header class="header">
+      <h1>Old to New Price</h1>
+      <p class="subtitle">Convert harga lama (sebelum 18 Mei) ke harga baru dengan Net Income yang sama</p>
+    </header>
+
+    <div class="store-tabs">
+      <button type="button" class="store-tab active" data-store="technosify">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        Technosify
+      </button>
+      <button type="button" class="store-tab" data-store="itpoint">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        IT Point
+      </button>
+    </div>
+
+    <div class="input-section">
+      <label for="category">PILIH KATEGORI FEE</label>
+      <select id="category" autocomplete="off">
+        <option value="">Belum ada kategori - atur dulu di fee kategori</option>
+      </select>
+      <label for="price-old">INPUT HARGA TOKOPEDIA LAMA (IDR)</label>
+      <input type="text" id="price-old" placeholder="Rp 0" inputmode="numeric" autocomplete="off">
+      <p class="helper">Masukkan harga tayang di Tokopedia (sebelum 18 Mei)</p>
+    </div>
+
+    <div class="output-grid">
+      <!-- Card 1: Old Price & Net Income -->
+      <div class="output-card" id="card-old">
+        <div class="arrow-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </div>
+        <div class="output-card-header">
+          <div class="output-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div class="output-card-title-wrap">
+            <div class="output-card-title">Tokopedia (Sebelum 18 Mei)</div>
+            <span class="output-card-tag mall" id="tag-tokped-old">MALL</span>
+          </div>
+        </div>
+        <div class="output-net-label">Target Net Income (Fee 4%)</div>
+        <div class="output-net-value" id="net-old">Rp 0</div>
+        <div id="breakdown-old"></div>
+      </div>
+
+      <!-- Card 2: New Price needed for that Net Income -->
+      <div class="output-card" id="card-new">
+        <div class="output-card-header">
+          <div class="output-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div class="output-card-title-wrap">
+            <div class="output-card-title">Tokopedia (Setelah 18 Mei)</div>
+            <span class="output-card-tag mall" id="tag-tokped-new">MALL</span>
+          </div>
+        </div>
+        <div class="output-net-label">Harga Tayang Baru (Fee 3%)</div>
+        <div class="output-net-value" id="price-new">Rp 0</div>
+        <div id="breakdown-new"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://chvmmyhxmyzbspieqway.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNodm1teWh4bXl6YnNwaWVxd2F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5NzY4NDgsImV4cCI6MjA4NjU1Mjg0OH0.pyHGGh43arTqs8Oc8AOXLPDB_ldk1MYErRBIuF1kv5E";
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const CATEGORY_TABLE = "categories";
+    const SETTINGS_TABLE = "app_settings";
+    const DEFAULT_SERVICE_FEE_RATE = {
+      technosify: { tokped: 0.025 },
+      itpoint: { tokped: 0.0425 },
+    };
+    const fmt = (n) => new Intl.NumberFormat('id-ID', { style: 'decimal', maximumFractionDigits: 0 }).format(n);
+
+    function getStore() {
+      return document.querySelector('.store-tab.active').dataset.store;
+    }
+
+    function parseIdrInput(value) {
+      const raw = String(value).replace(/[^\d]/g, '');
+      return parseInt(raw, 10) || 0;
+    }
+
+    function formatPercent(value) {
+      return Number(value).toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    let categorySettingsCache = [];
+    let defaultCategoryIdCache = "";
+
+    async function loadCategorySettings() {
+      const { data, error } = await db
+        .from(CATEGORY_TABLE)
+        .select('id,name,tokped_mall_fee,tokped_regular_fee')
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      categorySettingsCache = (data || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        tokpedMallFee: Number(item.tokped_mall_fee) || 0,
+        tokpedRegularFee: Number(item.tokped_regular_fee) || 0,
+      }));
+    }
+
+    async function loadDefaultCategoryId() {
+      const { data, error } = await db
+        .from(SETTINGS_TABLE)
+        .select("default_category_id")
+        .eq("id", 1)
+        .maybeSingle();
+      if (error) {
+        defaultCategoryIdCache = "";
+        return;
+      }
+      defaultCategoryIdCache = data?.default_category_id || "";
+    }
+
+    function populateCategoryDropdown() {
+      const items = categorySettingsCache;
+      const dropdown = document.getElementById('category');
+      const selectedValue = dropdown.value;
+      const defaultCategoryId = defaultCategoryIdCache;
+
+      dropdown.innerHTML = '';
+      if (!items.length) {
+        dropdown.add(new Option('Belum ada kategori - atur dulu di fee kategori', ''));
+        return;
+      }
+      items.forEach((item) => {
+        dropdown.add(new Option(item.name, item.id));
+      });
+
+      const hasSelected = items.some((item) => item.id === selectedValue);
+      const hasDefault = items.some((item) => item.id === defaultCategoryId);
+      dropdown.value = hasSelected ? selectedValue : (hasDefault ? defaultCategoryId : items[0].id);
+    }
+
+    function getSelectedCategory() {
+      const selectedId = document.getElementById('category').value;
+      if (!selectedId) return null;
+      return categorySettingsCache.find((item) => item.id === selectedId) || null;
+    }
+
+    function getServiceFeeRate(store, selectedCategory) {
+      const defaultRate = DEFAULT_SERVICE_FEE_RATE[store]?.tokped ?? 0;
+      if (!selectedCategory) return defaultRate;
+
+      const feePercent = store === 'technosify' ? selectedCategory.tokpedMallFee : selectedCategory.tokpedRegularFee;
+      const parsed = Number(feePercent);
+      if (!Number.isFinite(parsed) || parsed < 0) return defaultRate;
+      return parsed / 100;
+    }
+
+    function normalizeIdrInput(el) {
+      const raw = String(el.value).replace(/\D/g, '');
+      const newValue = raw === '' ? '' : 'Rp ' + fmt(parseInt(raw, 10));
+      if (el.value !== newValue) {
+        el.value = newValue;
+        el.setSelectionRange(newValue.length, newValue.length);
+      }
+    }
+
+    function formatIdrOnBlur(el) {
+      const raw = String(el.value).replace(/\D/g, '');
+      if (raw === '') {
+        el.value = '';
+        return;
+      }
+      const num = parseInt(raw, 10);
+      el.value = 'Rp ' + fmt(num);
+    }
+
+    function feesTokpedMallBefore(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xbp = Math.min(0.035 * harga, 60000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + biayaTransaksi;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
+          { label: 'Service Cost (1.8%, max 50k)', value: biayaJasa },
+          { label: 'Dynamic Comm (4%, max 40k)', value: komisiDinamis },
+          { label: 'XBP (3.5%, max 60k)', value: xbp },
+          { label: 'Transaction Fee', value: biayaTransaksi },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedMallAfter(harga, serviceFeeRate) {
+      const biayaLayanan = serviceFeeRate * harga;
+      const biayaJasa = Math.min(0.018 * harga, 50000);
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xbp = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
+      const biayaTransaksi = 1250;
+      const totalFee = biayaLayanan + biayaJasa + komisiDinamis + xbp + xbpSuper + biayaTransaksi;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: biayaLayanan },
+          { label: 'Service Cost (1.8%, max 50k)', value: biayaJasa },
+          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
+          { label: 'XBP (2.5%)', value: xbp },
+          { label: 'XBP Super (2%, max 20k)', value: xbpSuper },
+          { label: 'Transaction Fee', value: biayaTransaksi },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedBiasaBefore(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.04 * harga, 40000);
+      const xboost = Math.min(0.035 * harga, 60000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + biayaProses;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: komisi },
+          { label: 'Dynamic Comm (4%, max 40k)', value: komisiDinamis },
+          { label: 'XBoost (3.5%, max 60k)', value: xboost },
+          { label: 'Biaya proses', value: biayaProses },
+        ],
+        totalFee,
+      };
+    }
+
+    function feesTokpedBiasaAfter(harga, serviceFeeRate) {
+      const komisi = serviceFeeRate * harga;
+      const komisiDinamis = Math.min(0.04 * harga, 650000);
+      const xboost = 0.025 * harga;
+      const xbpSuper = Math.min(0.02 * harga, 20000);
+      const biayaProses = 1250;
+      const totalFee = komisi + komisiDinamis + xboost + xbpSuper + biayaProses;
+      const net = harga - totalFee;
+      return {
+        net,
+        basePrice: harga,
+        items: [
+          { label: `Service Fee (${formatPercent(serviceFeeRate * 100)}%)`, value: komisi },
+          { label: 'Dynamic Comm (3%, max 650k)', value: komisiDinamis },
+          { label: 'XBoost (2.5%)', value: xboost },
+          { label: 'XBP Super (2%, max 20k)', value: xbpSuper },
+          { label: 'Biaya proses', value: biayaProses },
+        ],
+        totalFee,
+      };
+    }
+
+    function calcNet(store, harga, selectedCategory, period = 'before') {
+      const serviceFeeRate = getServiceFeeRate(store, selectedCategory);
+      if (store === 'technosify') return period === 'before' ? feesTokpedMallBefore(harga, serviceFeeRate) : feesTokpedMallAfter(harga, serviceFeeRate);
+      if (store === 'itpoint') return period === 'before' ? feesTokpedBiasaBefore(harga, serviceFeeRate) : feesTokpedBiasaAfter(harga, serviceFeeRate);
+      return { net: 0, basePrice: harga, items: [], totalFee: 0 };
+    }
+
+    function findPriceForNet(store, targetNet, selectedCategory, period = 'before') {
+      if (targetNet <= 0) return { harga: 0, ...calcNet(store, 0, selectedCategory, period) };
+      let low = targetNet;
+      let high = targetNet * 3;
+      while (calcNet(store, high, selectedCategory, period).net < targetNet) high *= 2;
+      for (let i = 0; i < 80; i++) {
+        const mid = (low + high) / 2;
+        const { net } = calcNet(store, mid, selectedCategory, period);
+        if (Math.abs(net - targetNet) < 1) {
+          const finalHarga = Math.round(mid);
+          return { harga: finalHarga, ...calcNet(store, finalHarga, selectedCategory, period) };
+        }
+        if (net < targetNet) low = mid;
+        else high = mid;
+      }
+      const finalHarga = Math.round((low + high) / 2);
+      return { harga: finalHarga, ...calcNet(store, finalHarga, selectedCategory, period) };
+    }
+
+    function renderBreakdownM2N(container, data) {
+      if (!data.items || !data.items.length) {
+        container.innerHTML = '';
+        return;
+      }
+      let html = `<div class="breakdown-row base-price"><span class="label">Harga Tayang</span><span class="value">Rp ${fmt(data.basePrice)}</span></div>`;
+      data.items.forEach(({ label, value }) => {
+        html += `<div class="breakdown-row"><span class="label">${label}</span><span class="value">- Rp ${fmt(value)}</span></div>`;
+      });
+      html += `<div class="breakdown-row total-deductions"><span class="label">Total Potongan</span><span class="value">- Rp ${fmt(data.totalFee)}</span></div>`;
+      container.innerHTML = html;
+    }
+    
+    function renderBreakdownN2M(container, data, listPrice) {
+      if (!data.items || !data.items.length) {
+        container.innerHTML = '';
+        return;
+      }
+      let html = `<div class="breakdown-row base-price"><span class="label">Net Income (Sama)</span><span class="value" style="color: #6ee7b7;">Rp ${fmt(data.net)}</span></div>`;
+      data.items.forEach(({ label, value }) => {
+        html += `<div class="breakdown-row"><span class="label">${label}</span><span class="value">- Rp ${fmt(value)}</span></div>`;
+      });
+      html += `<div class="breakdown-row total-deductions"><span class="label">Total Potongan Baru</span><span class="value">- Rp ${fmt(data.totalFee)}</span></div>`;
+      container.innerHTML = html;
+    }
+
+    function updateCalculator() {
+      const store = getStore();
+      const oldPrice = parseIdrInput(document.getElementById('price-old').value);
+      const selectedCategory = getSelectedCategory();
+
+      // Set tags
+      const tagText = store === 'technosify' ? 'MALL' : 'REGULAR';
+      const tagClass = 'output-card-tag ' + (store === 'technosify' ? 'mall' : 'regular');
+      document.getElementById('tag-tokped-old').textContent = tagText;
+      document.getElementById('tag-tokped-old').className = tagClass;
+      document.getElementById('tag-tokped-new').textContent = tagText;
+      document.getElementById('tag-tokped-new').className = tagClass;
+
+      // 1. Calculate Old Net Income from Old Price (Before 18 May)
+      const oldData = calcNet(store, oldPrice, selectedCategory, 'before');
+      document.getElementById('net-old').textContent = 'Rp ' + fmt(oldData.net);
+      renderBreakdownM2N(document.getElementById('breakdown-old'), oldData);
+
+      // 2. Find New Price to achieve the SAME Net Income (After 18 May)
+      const newData = findPriceForNet(store, oldData.net, selectedCategory, 'after');
+      document.getElementById('price-new').textContent = 'Rp ' + fmt(newData.harga);
+      renderBreakdownN2M(document.getElementById('breakdown-new'), newData, newData.harga);
+    }
+
+    document.querySelectorAll('.store-tab').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.store-tab').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.body.className = btn.dataset.store === 'technosify' ? 'theme-technosify' : 'theme-itpoint';
+        updateCalculator();
+      });
+    });
+
+    const priceInput = document.getElementById('price-old');
+    const categorySelect = document.getElementById('category');
+
+    priceInput.addEventListener('input', () => {
+      normalizeIdrInput(priceInput);
+      updateCalculator();
+    });
+    priceInput.addEventListener('blur', () => formatIdrOnBlur(priceInput));
+
+    categorySelect.addEventListener('change', updateCalculator);
+
+    async function initPage() {
+      try {
+        await Promise.all([loadCategorySettings(), loadDefaultCategoryId()]);
+        populateCategoryDropdown();
+      } catch (_error) {
+      }
+      updateCalculator();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
