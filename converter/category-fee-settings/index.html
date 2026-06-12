@@ -163,6 +163,16 @@
       font-weight: 600;
     }
 
+    .edit-btn {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--accent-2);
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      margin-right: 0.4rem;
+    }
+
     .delete-btn {
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -225,7 +235,8 @@
         </div>
 
         <div class="submit-row">
-          <button type="submit">Tambah kategori</button>
+          <button type="submit" id="submitBtn">Tambah kategori</button>
+          <button type="button" id="cancelEditBtn" style="display: none;">Batal Edit</button>
           <div id="formMessage" class="message"></div>
         </div>
       </form>
@@ -271,9 +282,24 @@
     const tableBody = document.getElementById("tableBody");
     const emptyState = document.getElementById("emptyState");
     const formMessage = document.getElementById("formMessage");
+    const submitBtn = document.getElementById("submitBtn");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
 
     let settingsCache = [];
     let defaultCategoryId = "";
+    let editingId = null;
+
+    function resetForm() {
+      categoryForm.reset();
+      editingId = null;
+      if (submitBtn) submitBtn.textContent = "Tambah kategori";
+      if (cancelEditBtn) cancelEditBtn.style.display = "none";
+      clearMessage();
+    }
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener("click", resetForm);
+    }
 
     async function loadSettings() {
       const { data, error } = await db
@@ -356,7 +382,10 @@
               ? "<strong>Default</strong>"
               : "<button type='button' class='set-default-btn' data-id='" + item.id + "'>Jadikan default</button>") +
           "</td>",
-          "<td><button type='button' class='delete-btn' data-id='" + item.id + "'>Hapus</button></td>"
+          "<td>" +
+            "<button type='button' class='edit-btn' data-id='" + item.id + "'>Edit</button>" +
+            "<button type='button' class='delete-btn' data-id='" + item.id + "'>Hapus</button>" +
+          "</td>"
         ].join("");
         tableBody.appendChild(row);
       });
@@ -390,7 +419,7 @@
       }
 
       const isDuplicate = settingsCache.some(function (item) {
-        return item.name.toLowerCase() === name.toLowerCase();
+        return item.name.toLowerCase() === name.toLowerCase() && item.id !== editingId;
       });
 
       if (isDuplicate) {
@@ -400,19 +429,26 @@
 
       try {
         const payload = {
-          id: (window.crypto?.randomUUID?.() || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7))),
           name: name,
           tokped_mall_fee: tokpedMallFee,
           tokped_regular_fee: tokpedRegularFee,
           shopee_fee: shopeeFee
         };
-        const { error } = await db.from(CATEGORY_TABLE).insert(payload);
-        if (error) throw error;
+
+        if (editingId) {
+          const { error } = await db.from(CATEGORY_TABLE).update(payload).eq("id", editingId);
+          if (error) throw error;
+          showMessage("success", "Kategori berhasil diperbarui.");
+        } else {
+          payload.id = (window.crypto?.randomUUID?.() || (Date.now().toString(36) + Math.random().toString(36).slice(2, 7)));
+          const { error } = await db.from(CATEGORY_TABLE).insert(payload);
+          if (error) throw error;
+          showMessage("success", "Kategori berhasil ditambahkan.");
+        }
 
         await loadSettings();
         renderTable();
-        categoryForm.reset();
-        showMessage("success", "Kategori berhasil ditambahkan.");
+        resetForm();
         categoryNameInput.focus();
       } catch (_error) {
         showMessage("error", "Gagal menyimpan kategori ke database.");
@@ -437,6 +473,26 @@
         } catch (_error) {
           showMessage("error", "Gagal mengatur kategori default.");
         }
+        return;
+      }
+
+      if (target.classList.contains("edit-btn")) {
+        const idToEdit = target.getAttribute("data-id");
+        const item = settingsCache.find(function (item) {
+          return item.id === idToEdit;
+        });
+        if (!item) return;
+
+        editingId = item.id;
+        categoryNameInput.value = item.name;
+        tokpedMallFeeInput.value = item.tokpedMallFee;
+        tokpedRegularFeeInput.value = item.tokpedRegularFee;
+        shopeeFeeInput.value = item.shopeeFee;
+        
+        if (submitBtn) submitBtn.textContent = "Simpan Perubahan";
+        if (cancelEditBtn) cancelEditBtn.style.display = "inline-block";
+        clearMessage();
+        categoryNameInput.focus();
         return;
       }
 
