@@ -1241,10 +1241,31 @@
         const rowElement = target.closest("tr[data-row-id]");
         if (!rowElement) return;
         const rowId = rowElement.dataset.rowId;
-        const rowData = rows.find((item) => item.id === rowId);
-        if (!rowData) return;
-        rowData.categoryId = target.value;
-        updateOneRowDisplay(rowElement, rowData);
+        const rowIndex = rows.findIndex((item) => item.id === rowId);
+        if (rowIndex < 0) return;
+
+        const val = target.value;
+
+        // If the changed cell is part of the current selection, apply to all selected rows
+        if (selection && rowIndex >= selection.startRow && rowIndex <= selection.endRow && selection.startCol <= 2 && selection.endCol >= 2) {
+          for (let r = selection.startRow; r <= selection.endRow; r++) {
+            const rData = rows[r];
+            if (rData) {
+              rData.categoryId = val;
+              const tr = tableBody.querySelector("tr[data-row-id='" + rData.id + "']");
+              if (tr) {
+                const s = tr.querySelector("select[data-field='categoryId']");
+                if (s) s.value = val;
+                updateOneRowDisplay(tr, rData);
+              }
+            }
+          }
+        } else {
+          const rowData = rows[rowIndex];
+          rowData.categoryId = val;
+          updateOneRowDisplay(rowElement, rowData);
+        }
+
         scheduleSaveRows();
       });
 
