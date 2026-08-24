@@ -1247,7 +1247,7 @@
         const val = target.value;
 
         // If the changed cell is part of the current selection, apply to all selected rows
-        if (selection && rowIndex >= selection.startRow && rowIndex <= selection.endRow && selection.startCol <= 2 && selection.endCol >= 2) {
+        if (selection && rowIndex >= selection.startRow && rowIndex <= selection.endRow) {
           for (let r = selection.startRow; r <= selection.endRow; r++) {
             const rData = rows[r];
             if (rData) {
@@ -1315,7 +1315,7 @@
         if (!Number.isFinite(row) || !Number.isFinite(col)) return;
 
         if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) && !event.altKey) {
-          if (isInsideSelection(row, col)) {
+          if (selection && row >= selection.startRow && row <= selection.endRow) {
             return;
           }
           setSelection(row, col, row, col);
