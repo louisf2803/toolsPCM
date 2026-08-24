@@ -355,6 +355,61 @@
         min-width: 0;
       }
     }
+
+    /* Custom Context Menu styling */
+    .context-menu {
+      position: absolute;
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      padding: 0.35rem 0;
+      z-index: 1000;
+      display: none;
+      min-width: 220px;
+    }
+
+    .context-menu-item {
+      padding: 0.45rem 1rem;
+      font-size: 0.84rem;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      transition: background 0.12s ease;
+    }
+
+    .context-menu-item:hover {
+      background: rgba(60, 179, 211, 0.15);
+      color: #ffffff;
+    }
+
+    .context-menu-submenu {
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: var(--modal-bg);
+      border: 1px solid var(--modal-border);
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      padding: 0.35rem 0;
+      display: none;
+      min-width: 180px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .context-menu-item:hover > .context-menu-submenu {
+      display: block;
+    }
+
+    .context-menu-separator {
+      height: 1px;
+      background: rgba(106, 140, 176, 0.18);
+      margin: 0.35rem 0;
+    }
   </style>
 </head>
 <body class="theme-technosify">
@@ -399,6 +454,29 @@
       </div>
     </div>
   </main>
+
+  <div class="context-menu" id="contextMenu">
+    <div class="context-menu-item" id="menuApplyThis">
+      <span>Terapkan Kategori ke Baris Ini</span>
+      <span style="font-size: 0.7rem; margin-left: 0.5rem; opacity: 0.8;">▶</span>
+      <div class="context-menu-submenu" id="submenuThis"></div>
+    </div>
+    <div class="context-menu-item" id="menuApplySelected">
+      <span>Terapkan Kategori ke Seleksi</span>
+      <span style="font-size: 0.7rem; margin-left: 0.5rem; opacity: 0.8;">▶</span>
+      <div class="context-menu-submenu" id="submenuSelected"></div>
+    </div>
+    <div class="context-menu-item" id="menuApplyAll">
+      <span>Terapkan Kategori ke Semua Baris</span>
+      <span style="font-size: 0.7rem; margin-left: 0.5rem; opacity: 0.8;">▶</span>
+      <div class="context-menu-submenu" id="submenuAll"></div>
+    </div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" id="menuCopySelected">Salin Seleksi (Excel/GSheet)</div>
+    <div class="context-menu-item" id="menuCopyAll">Salin Semua (Excel/GSheet)</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" id="menuClearSelected">Kosongkan Seleksi</div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -1109,6 +1187,131 @@
       copyTextToClipboard(tsvText, "Seluruh tabel disalin ke clipboard!");
     }
 
+    function openContextMenu(clientX, clientY, rightClickedRow) {
+      const menu = document.getElementById("contextMenu");
+      if (!menu) return;
+
+      const categories = readCategories();
+      const createSubmenuItems = (actionCallback) => {
+        if (!categories.length) {
+          const emptyDiv = document.createElement("div");
+          emptyDiv.className = "context-menu-item";
+          emptyDiv.style.color = "var(--muted)";
+          emptyDiv.style.pointerEvents = "none";
+          emptyDiv.textContent = "Belum ada kategori";
+          return [emptyDiv];
+        }
+        return categories.map((cat) => {
+          const item = document.createElement("div");
+          item.className = "context-menu-item";
+          item.textContent = cat.name;
+          item.addEventListener("click", (e) => {
+            e.stopPropagation();
+            actionCallback(cat.id);
+            closeContextMenu();
+          });
+          return item;
+        });
+      };
+
+      const subThis = document.getElementById("submenuThis");
+      if (subThis) {
+        subThis.innerHTML = "";
+        createSubmenuItems((catId) => {
+          const rData = rows[rightClickedRow];
+          if (rData) {
+            rData.categoryId = catId;
+            const tr = tableBody.querySelector("tr[data-row-id='" + rData.id + "']");
+            if (tr) {
+              const s = tr.querySelector("select[data-field='categoryId']");
+              if (s) s.value = catId;
+              updateOneRowDisplay(tr, rData);
+            }
+            scheduleSaveRows();
+          }
+        }).forEach(el => subThis.appendChild(el));
+      }
+
+      const subSelected = document.getElementById("submenuSelected");
+      const menuApplySelected = document.getElementById("menuApplySelected");
+      if (subSelected && menuApplySelected) {
+        subSelected.innerHTML = "";
+        const hasMultiSelection = selection && (selection.startRow !== selection.endRow || selection.startCol !== selection.endCol);
+        if (hasMultiSelection) {
+          menuApplySelected.style.display = "flex";
+          createSubmenuItems((catId) => {
+            for (let r = selection.startRow; r <= selection.endRow; r++) {
+              const rData = rows[r];
+              if (rData) {
+                rData.categoryId = catId;
+                const tr = tableBody.querySelector("tr[data-row-id='" + rData.id + "']");
+                if (tr) {
+                  const s = tr.querySelector("select[data-field='categoryId']");
+                  if (s) s.value = catId;
+                  updateOneRowDisplay(tr, rData);
+                }
+              }
+            }
+            scheduleSaveRows();
+          }).forEach(el => subSelected.appendChild(el));
+        } else {
+          menuApplySelected.style.display = "none";
+        }
+      }
+
+      const subAll = document.getElementById("submenuAll");
+      if (subAll) {
+        subAll.innerHTML = "";
+        createSubmenuItems((catId) => {
+          rows.forEach((rData) => {
+            rData.categoryId = catId;
+            const tr = tableBody.querySelector("tr[data-row-id='" + rData.id + "']");
+            if (tr) {
+              const s = tr.querySelector("select[data-field='categoryId']");
+              if (s) s.value = catId;
+              updateOneRowDisplay(tr, rData);
+            }
+          });
+          scheduleSaveRows();
+        }).forEach(el => subAll.appendChild(el));
+      }
+
+      menu.style.display = "block";
+
+      const menuWidth = menu.offsetWidth;
+      const menuHeight = menu.offsetHeight;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      let left = clientX + window.scrollX;
+      let top = clientY + window.scrollY;
+
+      if (clientX + menuWidth > windowWidth) {
+        left = clientX - menuWidth + window.scrollX;
+        document.querySelectorAll(".context-menu-submenu").forEach((sub) => {
+          sub.style.left = "auto";
+          sub.style.right = "100%";
+        });
+      } else {
+        document.querySelectorAll(".context-menu-submenu").forEach((sub) => {
+          sub.style.left = "100%";
+          sub.style.right = "auto";
+        });
+      }
+
+      if (clientY + menuHeight > windowHeight) {
+        top = clientY - menuHeight + window.scrollY;
+      }
+
+      menu.style.left = left + "px";
+      menu.style.top = top + "px";
+    }
+
+    function closeContextMenu() {
+      const menu = document.getElementById("contextMenu");
+      if (menu) menu.style.display = "none";
+    }
+
     function parseClipboardGrid(text) {
       const normalized = String(text || "").replace(/\r/g, "");
       const lines = normalized.split("\n").filter((line, index, arr) => {
@@ -1181,6 +1384,57 @@
       if (copyBtn) {
         copyBtn.addEventListener("click", () => {
           copyEntireTableToClipboard();
+        });
+      }
+
+      tableBody.addEventListener("contextmenu", (event) => {
+        const cell = event.target.closest("td[data-row-index][data-col-index]");
+        if (!cell) return;
+
+        event.preventDefault();
+
+        const row = parseInt(cell.dataset.rowIndex, 10);
+        const col = parseInt(cell.dataset.colIndex, 10);
+        if (!Number.isFinite(row) || !Number.isFinite(col)) return;
+
+        if (!selection || row < selection.startRow || row > selection.endRow || col < selection.startCol || col > selection.endCol) {
+          setSelection(row, col, row, col);
+        }
+
+        openContextMenu(event.clientX, event.clientY, row);
+      });
+
+      document.addEventListener("click", () => {
+        closeContextMenu();
+      });
+
+      const menuCopySelected = document.getElementById("menuCopySelected");
+      if (menuCopySelected) {
+        menuCopySelected.addEventListener("click", () => {
+          if (!selection) return;
+          let tsvLines = [];
+          for (let r = selection.startRow; r <= selection.endRow; r++) {
+            let line = [];
+            for (let c = selection.startCol; c <= selection.endCol; c++) {
+              line.push(getCellValueForClipboard(r, c));
+            }
+            tsvLines.push(line.join("\t"));
+          }
+          copyTextToClipboard(tsvLines.join("\n"), "Bagian terseleksi disalin!");
+        });
+      }
+
+      const menuCopyAll = document.getElementById("menuCopyAll");
+      if (menuCopyAll) {
+        menuCopyAll.addEventListener("click", () => {
+          copyEntireTableToClipboard();
+        });
+      }
+
+      const menuClearSelected = document.getElementById("menuClearSelected");
+      if (menuClearSelected) {
+        menuClearSelected.addEventListener("click", () => {
+          clearSelectedEditableCells();
         });
       }
 
@@ -1380,6 +1634,9 @@
       });
 
       document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeContextMenu();
+        }
         if (!selection) return;
         const focused = document.activeElement;
         const isEditingField = focused instanceof HTMLInputElement || focused instanceof HTMLSelectElement || focused === projectTitleInput;
