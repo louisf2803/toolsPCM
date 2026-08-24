@@ -1315,6 +1315,9 @@
         if (!Number.isFinite(row) || !Number.isFinite(col)) return;
 
         if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) && !event.altKey) {
+          if (isInsideSelection(row, col)) {
+            return;
+          }
           setSelection(row, col, row, col);
           return;
         }
