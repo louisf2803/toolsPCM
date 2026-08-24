@@ -313,6 +313,13 @@
       font-size: 0.82rem;
       font-family: inherit;
       cursor: pointer;
+      transition: border-color 0.16s ease, color 0.16s ease, background-color 0.16s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--brand);
+      color: #ffffff;
+      background: rgba(20, 35, 58, 0.85);
     }
 
     .status-text {
@@ -384,7 +391,9 @@
     </section>
 
     <div class="footer-actions">
-      <div class="left-actions"></div>
+      <div class="left-actions">
+        <button type="button" class="btn" id="copyTableBtn">Salin Semua Tabel</button>
+      </div>
       <div class="right-actions">
         <span class="status-text" id="statusText">Tersimpan otomatis</span>
       </div>
@@ -998,6 +1007,108 @@
       return String(rawValue || "");
     }
 
+    function getCellValueForClipboard(rowIndex, colIndex) {
+      const row = rows[rowIndex];
+      if (!row) return "";
+
+      if (colIndex === 0) {
+        return String(rowIndex + 1);
+      }
+      if (colIndex === 1) {
+        return row.itemName || "";
+      }
+      if (colIndex === 2) {
+        const categories = readCategories();
+        const category = categories.find((item) => item.id === row.categoryId) || null;
+        return category ? category.name : "";
+      }
+      if (colIndex === 3) {
+        return row.sourceValue || "";
+      }
+
+      const result = calculateRow(row);
+      let rawVal = "";
+      if (colIndex === 4) rawVal = result.tokpedBefore;
+      else if (colIndex === 5) rawVal = result.tokpedAfter;
+      else if (colIndex === 6) rawVal = result.shopee;
+
+      return rawVal.replace(/[^\d-]/g, "");
+    }
+
+    function copyTextToClipboard(text, successMessage) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showCopyStatus(successMessage);
+        }).catch((err) => {
+          fallbackCopyTextToClipboard(text, successMessage);
+        });
+      } else {
+        fallbackCopyTextToClipboard(text, successMessage);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text, successMessage) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showCopyStatus(successMessage);
+        } else {
+          statusText.textContent = "Gagal menyalin tabel";
+        }
+      } catch (err) {
+        console.error("Fallback copy failed", err);
+        statusText.textContent = "Gagal menyalin tabel";
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showCopyStatus(message) {
+      const prevText = statusText.textContent;
+      statusText.textContent = message;
+      setTimeout(() => {
+        statusText.textContent = prevText;
+      }, 2000);
+    }
+
+    function copyEntireTableToClipboard() {
+      const isN2M = project.type === "net_income_to_marketplace";
+      const headers = isN2M
+        ? ["No", "Nama Barang", "Kat. Fee", "Net Income", "Tokped (< 18 Mei)", "Tokped (>= 18 Mei)", "Marketplace Shopee"]
+        : ["No", "Nama Barang", "Kat. Fee", "Marketplace Price", "Tokped Net (< 18 Mei)", "Tokped Net (>= 18 Mei)", "Net Income Shopee"];
+
+      let tsvLines = [headers.join("\t")];
+
+      let lastNonEmptyIndex = -1;
+      for (let i = rows.length - 1; i >= 0; i--) {
+        if ((rows[i].itemName || "").trim() || (rows[i].sourceValue || "").trim()) {
+          lastNonEmptyIndex = i;
+          break;
+        }
+      }
+
+      const limit = lastNonEmptyIndex !== -1 ? lastNonEmptyIndex : 0;
+      for (let i = 0; i <= limit; i++) {
+        let line = [];
+        for (let c = 0; c <= 6; c++) {
+          line.push(getCellValueForClipboard(i, c));
+        }
+        tsvLines.push(line.join("\t"));
+      }
+
+      const tsvText = tsvLines.join("\n");
+      copyTextToClipboard(tsvText, "Seluruh tabel disalin ke clipboard!");
+    }
+
     function parseClipboardGrid(text) {
       const normalized = String(text || "").replace(/\r/g, "");
       const lines = normalized.split("\n").filter((line, index, arr) => {
@@ -1064,6 +1175,41 @@
           applyTheme(currentStore);
           renderRows();
         });
+      });
+
+      const copyBtn = document.getElementById("copyTableBtn");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+          copyEntireTableToClipboard();
+        });
+      }
+
+      document.addEventListener("copy", (event) => {
+        const activeEl = document.activeElement;
+        if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA")) {
+          const start = activeEl.selectionStart;
+          const end = activeEl.selectionEnd;
+          if (start !== null && end !== null && start !== end) {
+            return;
+          }
+        }
+
+        if (!selection) return;
+
+        let tsvLines = [];
+        for (let r = selection.startRow; r <= selection.endRow; r++) {
+          let line = [];
+          for (let c = selection.startCol; c <= selection.endCol; c++) {
+            line.push(getCellValueForClipboard(r, c));
+          }
+          tsvLines.push(line.join("\t"));
+        }
+        const tsvText = tsvLines.join("\n");
+
+        event.clipboardData.setData("text/plain", tsvText);
+        event.preventDefault();
+
+        showCopyStatus("Bagian terseleksi disalin!");
       });
 
       tableBody.addEventListener("input", (event) => {
@@ -1143,12 +1289,14 @@
       tableBody.addEventListener("mousedown", (event) => {
         const cell = event.target.closest("td[data-row-index][data-col-index]");
         if (!cell) return;
-        if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) && !event.altKey) {
-          return;
-        }
         const row = parseInt(cell.dataset.rowIndex, 10);
         const col = parseInt(cell.dataset.colIndex, 10);
         if (!Number.isFinite(row) || !Number.isFinite(col)) return;
+
+        if ((event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) && !event.altKey) {
+          setSelection(row, col, row, col);
+          return;
+        }
 
         if (isSelectionBorderHit(cell, event.clientX, event.clientY)) {
           isDraggingSelection = true;
